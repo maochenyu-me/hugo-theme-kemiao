@@ -1,0 +1,40 @@
+{{- /* 评论区：按 provider 渲染挂载点；Artalk/Twikoo 由 site.js 动态加载，Ecoku 由官方 loader 自举 */}}
+{{- $provider := site.Params.comments.provider | default "artalk" -}}
+{{- $ecoku := site.Params.comments.ecoku | default dict -}}
+{{- $server := $ecoku.serverUrl | default "" -}}
+{{- $siteId := $ecoku.siteId | default "" -}}
+{{- $js := $ecoku.jsUrl | default (printf "%s/client/ecoku-loader.js" $server) -}}
+<section class="mt-10">
+  <div id="comment-section" class="comment-section">
+    {{- if eq $provider "twikoo" }}
+      <div id="twikoo-comments"
+        data-env-id="{{ site.Params.comments.twikoo.envId | default "" }}"></div>
+    {{- else if eq $provider "ecoku" }}
+      {{- if and $server $siteId }}
+      <section id="ecoku-comments" class="ecoku-shell" data-ecoku-comments
+        aria-label="评论区" aria-busy="false"
+        data-server-url="{{ $server }}"
+        data-site-id="{{ $siteId }}"
+        data-page-key="{{ .RelPermalink }}"
+        data-page-title="{{ .Title }}"
+        data-page-size="{{ $ecoku.pageSize | default 10 }}"
+        data-theme="{{ $ecoku.theme | default "auto" }}"
+        {{- with $ecoku.i18n }} data-i18n="{{ . }}"{{ end -}}
+        {{- with $ecoku.cssUrl }} data-css-url="{{ . }}"{{ end }}>
+        <div class="ecoku-loader" data-ecoku-loader hidden>
+          <p class="ecoku-loader-status" data-ecoku-status></p>
+          <button class="ecoku-loader-retry" data-ecoku-retry type="button" hidden>重新加载评论</button>
+        </div>
+        <div id="ecoku-mount" data-ecoku-mount></div>
+      </section>
+      <script src="{{ $js }}" defer></script>
+      {{- else }}
+      <div class="comment-failed">评论服务尚未配置。</div>
+      {{- end }}
+    {{- else }}
+      <div id="artalk-comments"
+        data-server="{{ site.Params.comments.artalk.server | default "" }}"
+        data-site="{{ site.Params.comments.artalk.site | default site.Title }}"></div>
+    {{- end }}
+  </div>
+</section>

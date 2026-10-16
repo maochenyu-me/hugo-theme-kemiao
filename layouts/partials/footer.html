@@ -1,0 +1,92 @@
+{{- $p := site.Params -}}
+<footer class="footer-wrapper mt-auto" role="contentinfo">
+  <div class="h-px w-full bg-linear-to-r from-transparent via-border/40 to-transparent"></div>
+  <div class="app-layout py-8 sm:py-10">
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col items-center gap-3 text-center md:flex-row md:items-center md:justify-between md:text-start">
+        <div class="flex flex-col items-center gap-2 md:items-start">
+          <a href="{{ site.Home.RelPermalink }}" aria-label="返回 {{ site.Title }} 首页" class="footer-brand-link group flex items-center gap-2 rounded-md">
+            <img src="{{ $p.avatar }}" alt="" class="footer-avatar size-8 rounded-full object-cover" loading="lazy" decoding="async" aria-hidden="true">
+            {{- partial "logo-svg.html" (dict "class" "footer-logo h-8 w-auto") }}
+          </a>
+          <p class="max-w-xl text-[0.9375rem] leading-relaxed text-foreground/58">好奇心转化为代码的空间。</p>
+        </div>
+        <nav aria-labelledby="footer-social-heading" class="flex flex-col items-center gap-2 md:items-end">
+          <p id="footer-social-heading" class="text-[0.9375rem] tracking-wide text-foreground/48">联系方式</p>
+          <ul class="flex flex-wrap items-center justify-center gap-2 md:justify-end" role="list">
+            <li>
+              <a tabindex="0" href="mailto:01@liushen.fun" aria-label="发送邮件给 {{ $p.author }}" title="发送邮件给 {{ $p.author }}" class="group inline-flex items-center gap-1 hover:text-accent footer-social-btn group relative flex size-9 items-center justify-center rounded-xl border border-border/20 bg-muted/20 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:bg-accent/10 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:outline-none">
+                <i class="fa-solid fa-envelope text-[1.05rem] leading-none text-foreground/60 transition-all duration-300 group-hover:text-accent" aria-hidden="true"></i>
+                <span class="sr-only">发送邮件给 {{ $p.author }}</span>
+              </a>
+            </li>
+            <li>
+              <a tabindex="0" href="http://wpa.qq.com/msgrd?v=3&amp;uin=3162475700&amp;site=qq&amp;menu=yes" target="_blank" rel="noopener noreferrer" aria-label="通过 QQ 联系 {{ $p.author }}" title="通过 QQ 联系 {{ $p.author }}" class="group inline-flex items-center gap-1 hover:text-accent footer-social-btn group relative flex size-9 items-center justify-center rounded-xl border border-border/20 bg-muted/20 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:bg-accent/10 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:outline-none">
+                <i class="fa-brands fa-qq text-[1.05rem] leading-none text-foreground/60 transition-all duration-300 group-hover:text-accent" aria-hidden="true"></i>
+                <span class="sr-only">通过 QQ 联系 {{ $p.author }}</span>
+              </a>
+            </li>
+            <li>
+              <a tabindex="0" href="https://github.com/willow-god" target="_blank" rel="noopener noreferrer" aria-label="{{ $p.author }} 的 GitHub" title="{{ $p.author }} 的 GitHub" class="group inline-flex items-center gap-1 hover:text-accent footer-social-btn group relative flex size-9 items-center justify-center rounded-xl border border-border/20 bg-muted/20 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:bg-accent/10 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:outline-none">
+                <i class="fa-brands fa-github text-[1.05rem] leading-none text-foreground/60 transition-all duration-300 group-hover:text-accent" aria-hidden="true"></i>
+                <span class="sr-only">{{ $p.author }} 的 GitHub</span>
+              </a>
+            </li>
+          </ul>
+          <div class="footer-line justify-center text-foreground/52 md:justify-end">
+            <a href="/info/" class="footer-inline-link">发展历程</a>
+            <span class="footer-separator" aria-hidden="true"></span>
+            <a href="/statement/" class="footer-inline-link">隐私政策</a>
+          </div>
+        </nav>
+      </div>
+      <div class="h-px w-full bg-linear-to-r from-transparent via-border/25 to-transparent"></div>
+      <div class="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+        <div class="flex flex-col items-center gap-2 text-center md:items-start md:text-start">
+          <p class="footer-line text-foreground/70">
+            <i class="fa-regular fa-copyright" aria-hidden="true"></i>
+            <span>{{ $p.copyrightStartYear }} - {{ now.Year }}</span>
+            <a href="https://www.liushen.fun/" target="_blank" rel="noopener" class="footer-inline-link font-medium text-foreground">{{ $p.author }}</a>
+          </p>
+          <div class="footer-line flex flex-wrap items-center justify-center text-foreground/52 md:justify-start">
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" class="footer-inline-link">{{ $p.beianIcp }}</a>
+            <span class="footer-separator" aria-hidden="true"></span>
+            <a href="https://beian.mps.gov.cn/#/query/webSearch?code={{ $p.beianPoliceCode }}" target="_blank" rel="noopener" class="footer-inline-link">{{ $p.beianPolice }}</a>
+          </div>
+        </div>
+        <div class="flex flex-col items-center gap-2 text-center md:items-end md:text-end">
+          <p id="footer-runtime" data-runtime-start="{{ $p.runtimeStart }}" class="footer-line text-foreground/58" aria-live="polite">本站已苟活: 0 天 00 时 00 分 00 秒</p>
+          <ul class="footer-line flex flex-wrap items-center justify-center text-foreground/52 md:justify-end" role="list">
+            <li>
+              <span class="footer-inline-link" title="HUGO">{{ $p.footerCredit }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<script>
+  // 页脚运行计时：逐秒刷新（与源站 footerRuntime 一致）
+  (function () {
+    var timer;
+    function stop() { if (timer) { window.clearInterval(timer); timer = undefined; } }
+    function fmt(ms) {
+      var s = Math.max(0, Math.floor(ms / 1000));
+      var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60;
+      return d + " 天 " + String(h).padStart(2, "0") + " 时 " + String(m).padStart(2, "0") + " 分 " + String(ss).padStart(2, "0") + " 秒";
+    }
+    function start() {
+      stop();
+      var el = document.getElementById("footer-runtime");
+      var v = el && el.dataset.runtimeStart;
+      if (!el || !v) return;
+      var t0 = new Date(v).getTime();
+      if (Number.isNaN(t0)) return;
+      var tick = function () { el.textContent = "本站已苟活: " + fmt(Date.now() - t0); };
+      tick();
+      timer = window.setInterval(tick, 1000);
+    }
+    start();
+  })();
+</script>

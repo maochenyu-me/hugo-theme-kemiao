@@ -1,0 +1,8 @@
+{{- /* 站点 Logo（头部用）：链接 + SVG + 紧凑首页按钮 */}}
+<a href="{{ site.Home.RelPermalink }}" data-header-logo-link class="group relative flex items-center gap-2 text-xl font-bold tracking-tight sm:text-2xl">
+  {{- partial "logo-svg.html" (dict "class" "header-logo h-8 w-auto sm:h-9") }}
+  <span class="sr-only">{{ site.Title }}</span>
+</a>
+<a href="{{ site.Home.RelPermalink }}" data-header-compact-home-link class="compact-home-link nav-icon-btn" aria-label="{{ site.Title }}">
+  <i class="fa-regular fa-house text-[1.05rem] leading-none" aria-hidden="true"></i>
+</a>

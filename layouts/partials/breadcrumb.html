@@ -1,0 +1,36 @@
+{{- /* 面包屑：文章页=返回按钮(cd ..)+路径条；独立页=simple 模式（~ / Label，1:1 源站） */}}
+{{- $simple := false }}
+{{- $label := "" }}
+{{- if reflect.IsMap . }}
+  {{- $simple = true }}
+  {{- $label = .label }}
+{{- end }}
+<nav aria-label="面包屑" class="mt-6 mb-2 flex items-center gap-2 overflow-hidden">
+  {{- if not $simple }}
+  <a id="back-button" href="/" class="breadcrumb-bar back-btn group flex-shrink-0 !gap-2 font-cartograph text-[0.9375rem] text-foreground/60 transition-colors duration-200 hover:text-accent focus-visible:ring-2 focus-visible:ring-accent/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none" aria-label="返回上一页。当前位置：{{ .Title }}">
+    <i class="fa-solid fa-chevron-left text-base leading-none opacity-70 transition-transform duration-200 group-hover:-translate-x-0.5 rtl:rotate-180 rtl:group-hover:translate-x-0.5" aria-hidden="true"></i>
+    <span aria-hidden="true" class="tracking-wide">cd ..</span>
+    <span class="visually-hidden">返回</span>
+  </a>
+  {{- end }}
+  <ol class="breadcrumb-bar{{ if not $simple }} has-back{{ end }} font-cartograph text-[0.9375rem]">
+    <li class="breadcrumb-item{{ if not $simple }} is-root{{ end }}">
+      <a href="{{ site.Home.RelPermalink }}" class="breadcrumb-home{{ if not $simple }} breadcrumb-link-soft{{ end }}" aria-label="首页" title="首页">
+        <span aria-hidden="true">~</span>
+        <span class="visually-hidden">首页</span>
+      </a>
+    </li>
+    {{- if $simple }}
+    <li class="breadcrumb-item is-current">
+      <span class="breadcrumb-current" aria-current="page" title="{{ $label }}">{{ $label }}</span>
+    </li>
+    {{- else }}
+    <li class="breadcrumb-item">
+      <a href="{{ with site.GetPage "/posts" }}{{ .RelPermalink }}{{ else }}{{ "posts/" | relURL }}{{ end }}" class="breadcrumb-link">Posts</a>
+    </li>
+    <li class="breadcrumb-item is-current">
+      <span class="breadcrumb-current" aria-current="page" title="{{ .Title }}">{{ .Title }}</span>
+    </li>
+    {{- end }}
+  </ol>
+</nav>

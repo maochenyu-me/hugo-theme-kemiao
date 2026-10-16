@@ -1,0 +1,79 @@
+{{/* 防白闪：渲染前设置 data-theme / data-font-mode（与源站逻辑一致） */}}
+<script>
+  (function () {
+    const AUTO = "auto";
+    const LIGHT = "light";
+    const DARK = "dark";
+    const SETTINGS_KEY = "site-settings";
+
+    function isThemeMode(mode) {
+      return [AUTO, LIGHT, DARK].includes(mode);
+    }
+
+    function readSettings() {
+      try {
+        const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+        return settings && typeof settings === "object" ? settings : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function writeThemeMode(mode) {
+      try {
+        const settings = readSettings();
+        settings["theme-mode"] = mode;
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        localStorage.removeItem("theme");
+      } catch {
+        // Theme persistence is progressive enhancement.
+      }
+    }
+
+    function readThemeMode() {
+      const settings = readSettings();
+      if (isThemeMode(settings["theme-mode"])) return settings["theme-mode"];
+      const legacyTheme = localStorage.getItem("theme");
+      return isThemeMode(legacyTheme) ? legacyTheme : AUTO;
+    }
+
+    function readYozaiFontPreference() {
+      const settings = readSettings();
+      return typeof settings["yozai-font"] === "boolean" ? settings["yozai-font"] : true;
+    }
+
+    function applyFontMode(yozaiFont) {
+      document.firstElementChild?.setAttribute("data-font-mode", yozaiFont ? "yozai" : "system");
+    }
+
+    function resolveTheme(mode) {
+      if (mode === LIGHT || mode === DARK) return mode;
+      const hour = new Date().getHours();
+      return hour >= 18 || hour < 8 ? DARK : LIGHT;
+    }
+
+    applyFontMode(readYozaiFontPreference());
+
+    const themeMode = readThemeMode();
+    const resolvedTheme = resolveTheme(themeMode);
+    writeThemeMode(themeMode);
+
+    document.firstElementChild?.setAttribute("data-theme", resolvedTheme);
+
+    window.theme = {
+      themeMode,
+      resolvedTheme,
+      themeValue: resolvedTheme,
+      getTheme: () => window.theme.resolvedTheme,
+      getThemeMode: () => window.theme.themeMode,
+      setTheme: val => {
+        window.theme.resolvedTheme = val;
+        window.theme.themeValue = val;
+      },
+      setThemeMode: val => {
+        window.theme.themeMode = val;
+        if (isThemeMode(val)) writeThemeMode(val);
+      },
+    };
+  })();
+</script>

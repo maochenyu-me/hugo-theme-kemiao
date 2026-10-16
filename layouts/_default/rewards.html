@@ -1,0 +1,47 @@
+{{- /* 支持作者：Hero + 感谢图 + 收款码 + 赞赏者列表（data/backers.yaml）+ 评论区 */}}
+{{- define "main" }}
+{{- $p := .Params }}
+{{- partial "page-hero.html" (dict "title" $p.hero.title "desc" $p.hero.desc "badges" $p.hero.badges "gradient" true) }}
+{{- with $p.thankImage }}
+<div class="thank-image"><img src="{{ . }}" alt="感谢" loading="lazy" decoding="async"></div>
+{{- end }}
+{{- with $p.qr }}
+<section class="patron-qr-set">
+  {{- range . }}
+  <div class="patron-qr-item">
+    <div class="patron-qr-image" data-caption="{{ .name }}">
+      <img src="{{ .image }}" alt="{{ .name }}" loading="lazy" decoding="async">
+    </div>
+    <div class="patron-qr-name">{{ .name }}</div>
+  </div>
+  {{- end }}
+</section>
+{{- end }}
+{{- $backers := hugo.Data.backers }}
+<section class="backers-section">
+  <p class="backers-quote">{{ $p.backersQuote }}</p>
+  <div class="backer-grid">
+    {{- range $backers }}
+    <div class="backer-card{{ with .url }} backer-linkable{{ end }}"{{ with .url }} data-href="{{ . }}"{{ end }}>
+      <div class="backer-bg" style="background-image:url({{ .avatar }})" aria-hidden="true"></div>
+      <div class="backer-left">
+        <div class="backer-identity">
+          <img src="{{ .avatar }}" alt="" class="backer-avatar" loading="lazy" decoding="async">
+          <span class="backer-name">{{ .name }}</span>
+        </div>
+        {{- with .desc }}<span class="backer-desc">{{ . }}</span>{{ end }}
+      </div>
+      <div class="backer-right">
+        <span class="backer-amount">{{ .amount }}</span>
+        <span class="backer-date">{{ .date }}</span>
+      </div>
+    </div>
+    {{- end }}
+  </div>
+  <div class="backers-stats">
+    <span>共计 <strong class="stat-accent">{{ len $backers }}</strong> 笔打款</span>
+    <span>累计金额 <strong class="stat-accent">{{ $p.total }}</strong></span>
+  </div>
+</section>
+{{- partial "comment-section.html" . }}
+{{- end }}

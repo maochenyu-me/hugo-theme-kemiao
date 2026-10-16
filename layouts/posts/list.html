@@ -1,0 +1,64 @@
+{{- /* 文章列表页（/posts/）：Hero + 搜索工具栏 + 三列卡片 + 分页 */}}
+{{- define "main" }}
+{{- partial "breadcrumb.html" (dict "label" "Posts") }}
+{{- $pages := where site.RegularPages "Type" "posts" }}
+{{- $paginator := .Paginate $pages }}
+{{- partial "page-hero.html" (dict
+    "title" "文章"
+    "desc" "我发布的所有文章。"
+    "badges" (slice (dict "text" (printf "%d 篇文章" (len $pages))) (dict "text" (printf "第 %d/%d 页" $paginator.PageNumber $paginator.TotalPages)))
+    "gradient" false) }}
+<div class="posts-toolbar mb-8">
+  <div class="posts-search-wrapper">
+    <div id="posts-algolia" class="premium-search">
+      <div class="algolia-ui">
+        <form class="algolia-ui__form" role="search">
+          <input class="algolia-ui__search-input" type="text" placeholder="Search" autocomplete="off" autocapitalize="none" spellcheck="false">
+          <button class="algolia-ui__search-clear" type="button" aria-label="清理搜索">
+            <i class="fa-solid fa-broom" aria-hidden="true"></i>
+            <span class="algolia-ui__search-clear-label">清理</span>
+          </button>
+        </form>
+        <div class="algolia-ui__results-area">
+          <p class="algolia-ui__message" aria-live="polite"></p>
+          <ol class="algolia-ui__results"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div data-default-posts-container class="w-full">
+  <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {{- range $paginator.Pages }}
+    {{- partial "post-grid-card.html" . }}
+    {{- end }}
+  </ul>
+</div>
+{{- if gt $paginator.TotalPages 1 }}
+<nav class="mt-12 mb-8 flex items-center justify-center gap-4" role="navigation" aria-label="Pagination Navigation">
+  {{- if $paginator.HasPrev }}
+  <a href="{{ $paginator.Prev.URL }}" aria-label="Goto Previous Page" class="group inline-flex items-center gap-1 hover:text-accent pagination-btn group/btn select-none">
+    <span class="btn-icon-wrapper"><i class="fa-solid fa-arrow-left text-[1.05rem] leading-none transition-transform duration-300 group-hover/btn:-translate-x-0.5" aria-hidden="true"></i></span>
+  </a>
+  {{- else }}
+  <span aria-disabled="true" tabindex="-1" role="link" aria-label="Goto Previous Page" class="group inline-flex items-center gap-1 pagination-btn group/btn select-none pointer-events-none opacity-50">
+    <span class="btn-icon-wrapper"><i class="fa-solid fa-arrow-left text-[1.05rem] leading-none transition-transform duration-300 group-hover/btn:-translate-x-0.5" aria-hidden="true"></i></span>
+  </span>
+  {{- end }}
+  <div class="pagination-info select-none">
+    <span class="font-semibold text-foreground">{{ $paginator.PageNumber }}</span>
+    <span class="mx-1 text-foreground/40">/</span>
+    <span class="text-foreground/70">{{ $paginator.TotalPages }}</span>
+  </div>
+  {{- if $paginator.HasNext }}
+  <a href="{{ $paginator.Next.URL }}" aria-label="Goto Next Page" class="group inline-flex items-center gap-1 hover:text-accent pagination-btn group/btn select-none">
+    <span class="btn-icon-wrapper"><i class="fa-solid fa-arrow-right text-[1.05rem] leading-none transition-transform duration-300 group-hover/btn:translate-x-0.5" aria-hidden="true"></i></span>
+  </a>
+  {{- else }}
+  <span aria-disabled="true" tabindex="-1" role="link" aria-label="Goto Next Page" class="group inline-flex items-center gap-1 pagination-btn group/btn select-none pointer-events-none opacity-50">
+    <span class="btn-icon-wrapper"><i class="fa-solid fa-arrow-right text-[1.05rem] leading-none transition-transform duration-300 group-hover/btn:translate-x-0.5" aria-hidden="true"></i></span>
+  </span>
+  {{- end }}
+</nav>
+{{- end }}
+{{- end }}

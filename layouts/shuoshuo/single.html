@@ -1,0 +1,21 @@
+{{- /* 单条说说详情页：完整正文 + 返回列表 + 评论区 */ -}}
+{{- define "main" }}
+{{- partial "breadcrumb.html" (dict "label" (.Params.title | default "说说")) }}
+<section class="mt-8">
+  <div class="shuoshuo-feed shuoshuo-feed-single">
+    <div class="shuoshuo-feed-list" data-reveal="ready">
+      <div class="shuoshuo-feed-item shuoshuo-feed-item-reveal" style="--shuoshuo-reveal-index: 0">
+        {{- partial "shuoshuo-card.html" (dict "page" . "full" true) }}
+      </div>
+    </div>
+  </div>
+  <div class="mt-6 flex justify-center">
+    <a class="shuoshuo-back-link" href="/shuoshuo/">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> 返回说说列表
+    </a>
+  </div>
+</section>
+{{- partial "comment-section.html" . }}
+{{- $js := resources.Get "js/shuoshuo-local.js" | js.Build (dict "minify" true) | fingerprint }}
+<script type="module" src="{{ $js.RelPermalink }}"></script>
+{{- end }}

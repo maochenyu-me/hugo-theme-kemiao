@@ -1,0 +1,7 @@
+{{- /* 留言板：Hero + 规范正文 + 评论区 */}}
+{{- define "main" }}
+{{- partial "breadcrumb.html" (dict "label" "Comment") }}
+{{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
+{{- with .Content }}{{ . }}{{ end }}
+{{- partial "comment-section.html" . }}
+{{- end }}

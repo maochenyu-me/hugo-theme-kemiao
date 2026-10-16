@@ -1,0 +1,20 @@
+{{- /* 移动端目录抽屉（lg 以下，底部抽屉形态） */}}
+{{- $hasToc := and .IsPage (gt (len .Fragments.Identifiers) 0) -}}
+{{- if $hasToc }}
+<div id="mobile-toc-drawer" class="mobile-toc-drawer lg:hidden" data-mobile-toc-drawer aria-hidden="true">
+  <button class="mobile-toc-backdrop" type="button" data-mobile-toc-close aria-label="关闭目录"></button>
+  <section class="mobile-toc-panel" aria-label="文章目录">
+    <div class="mobile-toc-handle" aria-hidden="true"></div>
+    <div class="mobile-toc-head">
+      <div class="mobile-toc-title">
+        <i class="fa-solid fa-list-ul" aria-hidden="true"></i>目录</div>
+      <button class="mobile-toc-close" type="button" data-mobile-toc-close aria-label="关闭目录">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+    <nav class="mobile-toc-content" data-mobile-toc-root data-toc-root>
+      {{ .TableOfContents }}
+    </nav>
+  </section>
+</div>
+{{- end }}

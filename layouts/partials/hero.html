@@ -1,0 +1,33 @@
+{{- /* 首页 Hero：终端提示徽章 + 大标题 + 简介 + 作者/社交（1:1 源站结构） */}}
+{{- $h := site.Params.hero -}}
+<section id="hero" class="hero-section relative pt-10 pb-14 sm:pt-14 sm:pb-20">
+  <div class="relative z-10">
+    <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-border/40 bg-muted/20 px-3.5 py-1.5 font-cartograph text-xs sm:text-sm">
+      <span class="relative flex h-2 w-2">
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60"></span>
+        <span class="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
+      </span>
+      <span class="text-accent">{{ $h.terminalPrefix }}</span>{{ $h.terminalPath }}<span class="opacity-40">{{ $h.terminalSuffix }}</span>
+    </div>
+    <div class="flex items-center gap-6 lg:gap-8">
+      <img src="{{ $h.avatar }}" alt="" class="hero-avatar hidden size-32 shrink-0 rounded-full border border-border/30 object-cover shadow-lg shadow-accent/8 sm:block lg:size-36" loading="eager" decoding="async" aria-hidden="true">
+      <div class="min-w-0">
+        <h1 class="hero-title mb-3 pb-1 text-5xl leading-[1.18] font-bold tracking-tight sm:text-6xl lg:text-7xl">{{ $h.title }}</h1>
+        <p class="mt-7 max-w-xl text-base leading-relaxed opacity-75 sm:text-lg">{{ site.Params.description }}</p>
+      </div>
+    </div>
+    <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+      <p class="flex-shrink-0 text-[0.9375rem] opacity-50">{{ $h.authorLabel }}<a tabindex="0" href="{{ $h.authorUrl }}" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-1 hover:text-accent font-medium underline decoration-dashed underline-offset-4">{{ $h.authorName }}</a></p>
+      <div class="border-border/40 sm:border-l sm:pl-4">
+        <div class="flex flex-wrap items-center gap-1">
+          {{- range $h.socials }}
+          <a tabindex="0" href="{{ .url }}" title="{{ .title }}" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-1 hover:text-accent p-2 hover:rotate-6 sm:p-1">
+            <i class="{{ .icon }} inline-block text-[1.45rem] leading-none opacity-90 sm:text-[1.3rem]{{ if .accent }} text-accent{{ end }}" aria-hidden="true"></i>
+            <span class="sr-only">{{ .title }}</span>
+          </a>
+          {{- end }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

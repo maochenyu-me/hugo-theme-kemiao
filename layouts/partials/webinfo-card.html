@@ -1,0 +1,17 @@
+{{- /* 网站信息卡（首页右栏与文章侧栏共用） */}}
+<div class="webinfo-card app-card app-card-glow card-glow group/sc p-4">
+  <div class="card-glow-effect" aria-hidden="true"></div>
+  <div class="relative z-5">
+    <h3 class="mb-3 flex items-center gap-2 text-[1.125rem] font-bold tracking-wide text-foreground">
+      <i class="fa-solid fa-chart-line text-sm leading-none text-accent/60" aria-hidden="true"></i>网站信息</h3>
+    {{- $posts := where site.RegularPages "Type" "posts" }}
+    {{- $words := 0 }}{{ range $posts }}{{ $words = add $words .WordCount }}{{ end }}
+    <dl class="webinfo-list">
+      <div><dt>文章数目</dt><dd>{{ len $posts }}</dd></div>
+      <div><dt>本站总字数</dt><dd>{{ $words }}</dd></div>
+      <div><dt>本站访客数</dt><dd id="busuanzi_site_uv">--</dd></div>
+      <div><dt>本站访问量</dt><dd id="busuanzi_site_pv">--</dd></div>
+      <div><dt>最后更新时间</dt><dd id="webinfo-last-build" data-build-timestamp="{{ now.UnixMilli }}">刚刚</dd></div>
+    </dl>
+  </div>
+</div>

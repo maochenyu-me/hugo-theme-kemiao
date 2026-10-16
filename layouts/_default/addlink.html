@@ -1,0 +1,6 @@
+{{- /* 友链申请：Hero + 申请卡片正文 + 评论区（含一键填充按钮） */}}
+{{- define "main" }}
+{{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
+{{- with .Content }}{{ . }}{{ end }}
+{{- partial "comment-section.html" . }}
+{{- end }}

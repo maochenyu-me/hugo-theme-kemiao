@@ -1,0 +1,23 @@
+{{- /* 友链朋友圈：Hero + 动态面板（数据由 fcircle.js 拉取 params.fcircle.api） */}}
+{{- define "main" }}
+{{- $hero := .Params.hero }}
+{{- $badges := slice }}
+{{- range $hero.badges }}
+  {{- if hasPrefix .text "等待同步" }}
+    {{- $badges = $badges | append (dict "text" "等待同步") }}
+  {{- else }}
+    {{- $badges = $badges | append . }}
+  {{- end }}
+{{- end }}
+{{- partial "page-hero.html" (dict "title" $hero.title "desc" $hero.desc "badges" $badges "gradient" true) }}
+<section class="fc-shell" data-fc-root data-fc-api="{{ site.Params.fcircle.api }}">
+  <div class="fc-random app-card" data-fc-random>
+    <div class="fc-loading"><span class="fc-spinner" aria-hidden="true"></span><span>正在加载友链动态...</span></div>
+  </div>
+  <div class="fc-grid" data-fc-list></div>
+  <button type="button" class="fc-more" data-fc-more hidden>再来亿点</button>
+  <p class="fc-meta" data-fc-meta></p>
+</section>
+{{- $js := resources.Get "js/fcircle.js" | js.Build (dict "minify" true) | fingerprint }}
+<script type="module" src="{{ $js.RelPermalink }}"></script>
+{{- end }}

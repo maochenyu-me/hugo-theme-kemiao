@@ -1,0 +1,87 @@
+{{- /* 文章页头：分类徽章 / 标题 / 标签 / 日期与统计 chips / AI 摘要卡（1:1 源站 PostHeader） */}}
+{{- $ai := site.Params.article.aiSummary -}}
+<header class="post-header relative mb-10 text-center">
+  <div class="post-hero-bg"></div>
+  <div class="relative z-10 overflow-hidden rounded-3xl border border-border/20 bg-muted/5 backdrop-blur-md">
+    <div class="relative px-6 pt-14 pb-5 sm:px-10 sm:pt-16 sm:pb-7">
+      {{- with .Params.categories }}
+      <div class="absolute top-4 left-4 flex flex-wrap gap-1.5 sm:top-5 sm:left-5">
+        {{- range . }}
+        <a href="{{ "categories/" | relURL }}{{ . | urlize }}/" class="post-category-badge inline-flex items-center gap-1.5 rounded-lg border border-accent/25 bg-accent/8 px-2.5 py-1 font-cartograph text-[0.9375rem] text-accent backdrop-blur-sm transition-all duration-200 hover:border-accent/45 hover:bg-accent/14 hover:shadow-sm hover:shadow-accent/10">
+          <i class="fa-solid fa-folder text-[0.875rem] leading-none" aria-hidden="true"></i>{{ . }}</a>
+        {{- end }}
+      </div>
+      {{- end }}
+      <h1 class="post-title text-3xl leading-tight font-bold tracking-tight sm:text-4xl lg:text-[2.75rem]">{{ .Title }}</h1>
+      {{- with .Params.tags }}
+      <div class="mt-4 flex flex-wrap justify-center gap-2">
+        {{- range . }}
+        <a href="{{ "tags/" | relURL }}{{ . | urlize }}/" class="post-tag-badge inline-flex items-center gap-1 rounded-full border border-accent/20 bg-accent/5 px-2.5 py-0.5 font-cartograph text-[0.8125rem] text-accent transition-all duration-200 hover:border-accent/40 hover:bg-accent/10 hover:shadow-sm hover:shadow-accent/10"><span class="opacity-50">#</span>{{ . }}</a>
+        {{- end }}
+      </div>
+      {{- end }}
+      <div class="mt-6 flex flex-col gap-3 text-[0.9375rem]">
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <div class="inline-flex items-center gap-1.5 rounded-lg border border-border/25 bg-muted/10 px-2.5 py-1 backdrop-blur-sm">
+            <i class="fa-regular fa-calendar-plus text-[0.875rem] leading-none text-accent/70" aria-hidden="true"></i>
+            <span class="opacity-70">发布于: {{ .Date.Format "2006-01-02" }}</span>
+          </div>
+          {{- if gt .Lastmod.Unix .Date.Unix }}
+          <div class="inline-flex items-center gap-1.5 rounded-lg border border-border/25 bg-muted/10 px-2.5 py-1 backdrop-blur-sm">
+            <i class="fa-regular fa-calendar-days text-[0.875rem] leading-none text-accent/70" aria-hidden="true"></i>
+            <span class="opacity-70">更新于: {{ .Lastmod.Format "2006-01-02" }}</span>
+          </div>
+          {{- else }}
+          <div class="inline-flex items-center gap-1.5 rounded-lg border border-border/25 bg-muted/10 px-2.5 py-1 backdrop-blur-sm">
+            <i class="fa-regular fa-calendar-days text-[0.875rem] leading-none text-accent/70" aria-hidden="true"></i>
+            <span class="opacity-70">更新于: {{ .Date.Format "2006-01-02" }}</span>
+          </div>
+          {{- end }}
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <div class="inline-flex items-center gap-1.5 rounded-lg border border-border/25 bg-muted/10 px-2.5 py-1 backdrop-blur-sm">
+            <i class="fa-regular fa-clock text-[0.875rem] leading-none text-accent/70" aria-hidden="true"></i>
+            <span class="opacity-70">{{ .ReadingTime }} 分钟</span>
+          </div>
+          <div class="inline-flex items-center gap-1.5 rounded-lg border border-border/25 bg-muted/10 px-2.5 py-1 backdrop-blur-sm">
+            <i class="fa-solid fa-book-open text-[0.875rem] leading-none text-accent/70" aria-hidden="true"></i>
+            <span class="opacity-70">{{ lang.FormatNumber 0 .WordCount }} 字</span>
+          </div>
+          <div class="inline-flex items-center gap-1.5 rounded-lg border border-border/25 bg-muted/10 px-2.5 py-1 backdrop-blur-sm">
+            <i class="fa-regular fa-eye text-[0.875rem] leading-none text-accent/70" aria-hidden="true"></i>
+            <span class="opacity-45">PV</span>
+            <span id="busuanzi_page_pv" class="opacity-70">--</span>
+          </div>
+          <div class="inline-flex items-center gap-1.5 rounded-lg border border-border/25 bg-muted/10 px-2.5 py-1 backdrop-blur-sm">
+            <i class="fa-solid fa-users text-[0.875rem] leading-none text-accent/70" aria-hidden="true"></i>
+            <span class="opacity-45">UV</span>
+            <span id="busuanzi_page_uv" class="opacity-70">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{- $aiText := .Params.aiSummary | default .Description }}
+    {{- with $aiText }}
+    <div class="px-3 pb-4 sm:px-6 sm:pb-6">
+      <section class="ai-summary-card text-start" aria-labelledby="ai-summary-title">
+        <div class="ai-summary-glow" aria-hidden="true"></div>
+        <div class="ai-summary-surface">
+          <div class="ai-summary-head" aria-hidden="true">
+            <span class="ai-summary-dot ai-summary-dot-red"></span>
+            <span class="ai-summary-dot ai-summary-dot-yellow"></span>
+            <span class="ai-summary-dot ai-summary-dot-green"></span>
+          </div>
+          <p class="ai-summary-text" data-ai-summary="{{ . }}"></p>
+          <div class="ai-summary-footer">
+            <div class="ai-summary-brand" id="ai-summary-title">
+              <i class="fa-solid fa-wand-magic-sparkles text-base leading-none" aria-hidden="true"></i>
+              <span>{{ $ai.brand }}</span>
+            </div>
+            <span class="ai-summary-model">{{ $ai.model }}</span>
+          </div>
+        </div>
+      </section>
+    </div>
+    {{- end }}
+  </div>
+</header>

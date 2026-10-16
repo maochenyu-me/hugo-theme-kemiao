@@ -1,0 +1,8 @@
+{{- /* 全局装饰层：网格 + 噪点（云山背景图随阶段②补齐） */}}
+<div class="site-backdrop pointer-events-none" aria-hidden="true">
+  <div class="site-grid"></div>
+  <div class="site-grain"></div>
+</div>
+{{- /* 消息条与右键菜单挂载点（阶段⑤实现行为） */}}
+<div id="site-snackbar-root" class="site-snackbar-box" data-site-message-avatar="{{ site.Params.avatar }}" data-site-message-title="站内消息" aria-live="polite" aria-atomic="false"></div>
+<div id="site-context-menu-root" class="site-context-menu-host" aria-hidden="true"></div>

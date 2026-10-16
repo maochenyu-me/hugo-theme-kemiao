@@ -1,0 +1,77 @@
+{{- $nav := hugo.Data.nav -}}
+<header id="main-header" class="sticky top-0 z-40 w-full">
+  <div class="header-scrolled-filter w-full">
+    <div class="app-layout">
+      <div id="top-nav-wrap" class="py-3 sm:py-5 relative w-full min-w-0 flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300">
+        <!-- 左区：中控台应用列表（more-app）+ Logo -->
+        <div class="header-floating-left relative z-30 flex min-w-0 shrink-0 items-center gap-2">
+          {{- partial "more-app-button.html" . }}
+          {{- partial "logo.html" . }}
+        </div>
+
+        <!-- 右区：桌面下拉导航 + 功能按钮 -->
+        <nav id="nav-menu" class="header-floating-right flex min-w-0 shrink-0 items-center gap-1">
+          <ul class="relative hidden overflow-visible lg:flex lg:flex-row lg:items-center lg:gap-1" data-glide-track>
+            <li class="glide-pill" data-glide-pill aria-hidden="true"></li>
+            {{- range $group := $nav }}
+            {{- /* 当前页落在该组任一链接时高亮（源站 nav-active 波浪线） */}}
+            {{- $cur := $.RelPermalink }}
+            {{- $isActive := false }}
+            {{- range $item := $group.links }}
+              {{- if and (not $item.external) (or (eq $item.url $cur) (and (ne $item.url "/") (hasPrefix $cur $item.url))) }}
+                {{- $isActive = true }}
+              {{- end }}
+            {{- end }}
+            <li class="nav-menu-item relative">
+              <button class="nav-link nav-dropdown-trigger{{ if $isActive }} nav-active{{ end }}" data-glide-item aria-haspopup="true" aria-expanded="false">
+                <span>{{ $group.name }}</span>
+              </button>
+              <ul class="nav-dropdown" data-glide-track>
+                <li class="glide-pill" data-glide-pill aria-hidden="true"></li>
+                {{- range $item := $group.links }}
+                <li>
+                  {{- if $item.external }}
+                  <a href="{{ $item.url }}" target="_blank" rel="noopener" class="nav-dropdown-link" data-glide-item>{{ $item.name }}</a>
+                  {{- else }}
+                  <a href="{{ $item.url }}" class="nav-dropdown-link" data-glide-item>{{ $item.name }}</a>
+                  {{- end }}
+                </li>
+                {{- end }}
+              </ul>
+            </li>
+            {{- end }}
+            <!-- Separator -->
+            <li class="flex items-center px-1" aria-hidden="true">
+              <div class="h-4 w-px bg-border/30"></div>
+            </li>
+          </ul>
+
+          <button data-search-trigger class="nav-icon-btn" title="搜索 (⌘K)" aria-label="打开搜索" aria-keyshortcuts="Meta+K">
+            <i class="fa-solid fa-magnifying-glass text-[1.05rem] leading-none" aria-hidden="true"></i>
+          </button>
+          <button type="button" data-control-console-trigger class="control-console-trigger nav-icon-btn relative" title="打开中控台" aria-label="打开中控台" aria-controls="site-control-console" aria-expanded="false">
+            <i data-control-console-open-icon class="fa-solid fa-bars-progress control-console-trigger-icon" aria-hidden="true"></i>
+            <i data-control-console-close-icon class="fa-solid fa-xmark control-console-trigger-icon control-console-trigger-icon-close" aria-hidden="true"></i>
+          </button>
+          {{- if and .IsPage (gt (len .Fragments.Identifiers) 0) }}
+          <button type="button" data-mobile-toc-trigger class="mobile-toc-trigger nav-icon-btn lg:hidden" title="目录" aria-label="打开目录" aria-controls="mobile-toc-drawer" aria-expanded="false">
+            <i class="fa-solid fa-list-ul text-[1.05rem] leading-none" aria-hidden="true"></i>
+          </button>
+          {{- end }}
+          <button type="button" data-header-scroll-top class="header-scroll-top-btn" title="返回顶部" aria-label="返回顶部" aria-hidden="true" tabindex="-1">
+            <span aria-hidden="true" data-header-scroll-progress class="header-scroll-top-progress"></span>
+            <span data-header-scroll-percent class="header-scroll-top-percent" aria-hidden="true">0</span>
+            <i class="fa-solid fa-arrow-up header-scroll-top-icon" aria-hidden="true"></i>
+          </button>
+          <button id="menu-btn" class="hamburger-btn grid place-items-center lg:hidden" aria-label="Open Menu" aria-expanded="false" aria-controls="mobile-menu">
+            <i class="fa-solid fa-angles-left mobile-menu-icon" aria-hidden="true"></i>
+          </button>
+        </nav>
+      </div>
+    </div>
+    <div id="header-border" class="header-border-line h-px w-full bg-linear-to-r from-transparent via-border/40 to-transparent opacity-0 transition-opacity duration-300"></div>
+  </div>
+  {{- /* 中控台 overlay 挂在 header 直接子级（与源站一致），确保 z-45 顶栏在 z-35 模糊层之上 */}}
+  {{- partial "control-console.html" . -}}
+  {{- partial "mobile-drawer.html" . }}
+</header>

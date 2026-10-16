@@ -1,0 +1,135 @@
+{{- /*
+  单条说说卡片（本地数据源，构建期渲染）。
+  参数：{page: 说说页面对象, full: true 时渲染全文（详情页），默认列表页 .Truncated 时用 Summary 截断}。
+  类名与 shuoshuo-page.js / site.css 1:1，瀑布流与灯箱由 shuoshuo-local.js 复用。
+*/ -}}
+{{- $p := .page }}
+{{- $full := .full | default false }}
+{{- $s := site.Params.shuoshuo }}
+{{- $id := $p.File.ContentBaseName }}
+
+{{- /* images / video 兼容单值与数组 */}}
+{{- $images := slice }}
+{{- with $p.Params.images }}
+  {{- if reflect.IsSlice . }}{{ $images = . }}{{ else }}{{ $images = slice . }}{{ end }}
+{{- end }}
+{{- $videos := slice }}
+{{- with $p.Params.video }}
+  {{- if reflect.IsSlice . }}{{ $videos = . }}{{ else }}{{ $videos = slice . }}{{ end }}
+{{- end }}
+
+{{- /* website 支持 string 或 {url, title} */}}
+{{- $website := "" }}
+{{- $websiteTitle := "" }}
+{{- with $p.Params.website }}
+  {{- if reflect.IsMap . }}
+    {{- $website = .url | default "" }}
+    {{- $websiteTitle = .title | default "" }}
+  {{- else }}
+    {{- $website = . }}
+  {{- end }}
+{{- end }}
+{{- $websiteHost := "" }}
+{{- with $website }}
+  {{- $u := urls.Parse $website }}
+  {{- $websiteHost = $u.Host }}
+  {{- if not $websiteTitle }}{{ $websiteTitle = $u.Host }}{{ end }}
+{{- end }}
+{{- $github := $p.Params.github | default "" }}
+{{- $githubRepo := "" }}
+{{- with $github }}
+  {{- $parts := split (strings.Trim (urls.Parse $github).Path "/") "/" }}
+  {{- if ge (len $parts) 2 }}
+    {{- $githubRepo = printf "%s/%s" (index $parts 0) (index $parts 1) }}
+  {{- else }}
+    {{- $githubRepo = delimit $parts "/" }}
+  {{- end }}
+{{- end }}
+
+{{- $truncated := and (not $full) $p.Truncated }}
+<article class="shuoshuo-card card-glow" data-shuoshuo-card="{{ $id }}" data-shuoshuo-url="{{ $p.RelPermalink }}">
+  <div class="shuoshuo-card-glow card-glow-effect" aria-hidden="true"></div>
+  <div class="shuoshuo-card-inner">
+    <header class="shuoshuo-card-header">
+      <img class="shuoshuo-avatar" src="{{ $s.avatar }}" alt="{{ $s.author }} 的头像" loading="lazy" decoding="async">
+      <div class="shuoshuo-meta">
+        <div class="shuoshuo-author">{{ $s.author }}</div>
+        <time class="shuoshuo-date" datetime="{{ $p.Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ $p.Date.Format "2006-01-02 15:04" }}</time>
+      </div>
+    </header>
+
+    {{- with (cond $truncated $p.Summary $p.Content) }}
+    <div class="shuoshuo-text">{{ trim . "\n \t" | safeHTML }}</div>
+    {{- end }}
+    {{- if $truncated }}
+    <a class="shuoshuo-more" href="{{ $p.RelPermalink }}">展开全文<i class="fa-solid fa-angles-right" aria-hidden="true"></i></a>
+    {{- end }}
+
+    {{- with $images }}
+    {{- $n := len . }}
+    <div class="shuoshuo-media-grid" data-layout="{{ if eq $n 1 }}single{{ else if eq $n 2 }}pair{{ else if eq $n 3 }}triple{{ else if eq $n 4 }}quad{{ else }}lead-grid{{ end }}">
+      {{- range $i, $src := . }}
+      <a class="shuoshuo-media-link" href="{{ $src }}" data-shuoshuo-fancybox="true" data-fancybox="shuoshuo-{{ $id }}" data-caption="说说配图"{{ if and (gt $n 4) (eq $i 0) }} data-layout="lead"{{ else }} data-layout="grid"{{ end }}>
+        <img class="shuoshuo-media-image" src="{{ $src }}" alt="{{ $p.Params.title | default "说说配图" }}" loading="lazy" decoding="async">
+      </a>
+      {{- end }}
+    </div>
+    {{- end }}
+
+    {{- range $videos }}
+    <div class="shuoshuo-video">
+      <video class="shuoshuo-video-player" src="{{ . }}" controls preload="metadata" playsinline></video>
+    </div>
+    {{- end }}
+
+    {{- with $website }}
+    <a class="shuoshuo-external-card" href="{{ $website }}" target="_blank" rel="nofollow noopener noreferrer">
+      <div class="shuoshuo-external-header"><span class="shuoshuo-external-badge">网站</span></div>
+      <div class="shuoshuo-external-main">
+        <span class="shuoshuo-external-icon"><i class="fa-solid fa-link" aria-hidden="true"></i></span>
+        <span class="shuoshuo-external-body">
+          <span class="shuoshuo-external-title">{{ $websiteTitle }}</span>
+          <span class="shuoshuo-external-subtitle">{{ $websiteHost }}</span>
+        </span>
+        <span class="shuoshuo-external-arrow"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
+      </div>
+    </a>
+    {{- end }}
+
+    {{- with $github }}
+    <a class="shuoshuo-external-card" href="{{ $github }}" target="_blank" rel="nofollow noopener noreferrer">
+      <div class="shuoshuo-external-header"><span class="shuoshuo-external-badge">GitHub</span></div>
+      <div class="shuoshuo-external-main">
+        <span class="shuoshuo-external-icon"><i class="fa-brands fa-github" aria-hidden="true"></i></span>
+        <span class="shuoshuo-external-body">
+          <span class="shuoshuo-external-title">{{ $githubRepo }}</span>
+          <span class="shuoshuo-external-subtitle">github.com</span>
+        </span>
+        <span class="shuoshuo-external-arrow"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
+      </div>
+    </a>
+    {{- end }}
+
+    <footer class="shuoshuo-card-footer">
+      <div class="shuoshuo-tags">
+        {{- if $p.Params.pinned }}
+        <span class="shuoshuo-pill shuoshuo-pill-accent"><i class="fa-solid fa-thumbtack" aria-hidden="true"></i> 置顶</span>
+        {{- end }}
+        {{- with $p.Params.location }}
+        <span class="shuoshuo-pill"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ . }}</span>
+        {{- end }}
+        {{- range $p.Params.tags | default slice }}
+        <span class="shuoshuo-pill"># {{ . }}</span>
+        {{- end }}
+      </div>
+      <div class="shuoshuo-card-actions">
+        <a class="shuoshuo-action-button shuoshuo-detail-button" href="{{ $p.RelPermalink }}" title="查看详情" aria-label="查看这条说说详情">
+          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </a>
+        <button class="shuoshuo-action-button shuoshuo-reply-button" type="button" title="回复这条说说" aria-label="回复这条说说">
+          <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
+        </button>
+      </div>
+    </footer>
+  </div>
+</article>

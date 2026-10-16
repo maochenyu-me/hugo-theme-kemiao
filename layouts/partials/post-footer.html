@@ -1,0 +1,77 @@
+{{- /* 文章尾区：end 分隔线 / 标签+分享 / 上下篇 / 评论区占位（1:1 源站） */}}
+{{- $share := site.Params.article.share -}}
+{{- $url := absURL .RelPermalink -}}
+<div class="relative mt-12 mb-8 flex items-center justify-center gap-4" aria-hidden="true">
+  <div class="relative h-px flex-1 bg-linear-to-r from-transparent via-border/30 to-accent/20">
+    <div class="absolute inset-0 bg-linear-to-r from-transparent via-accent/40 to-accent/40 blur-[2px]"></div>
+  </div>
+  <div class="relative z-10 flex items-center gap-2 font-cartograph text-[10px] tracking-widest text-accent/40 uppercase select-none">
+    <span class="h-1.5 w-1.5 rounded-full bg-accent/50 shadow-[0_0_8px_var(--color-accent)]"></span>end</div>
+  <div class="relative h-px flex-1 bg-linear-to-l from-transparent via-border/30 to-accent/20">
+    <div class="absolute inset-0 bg-linear-to-l from-transparent via-accent/40 to-accent/40 blur-[2px]"></div>
+  </div>
+</div>
+
+<div class="mt-6 mb-8 flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-between">
+  {{- with .Params.tags }}
+  <div class="flex flex-wrap justify-center gap-2 sm:justify-start" aria-hidden="true">
+    {{- range . }}
+    <a href="{{ "tags/" | relURL }}{{ . | urlize }}/" tabindex="-1" class="inline-flex items-center gap-1 rounded-full border border-border/25 bg-muted/10 px-2.5 py-1 font-cartograph text-[0.8125rem] transition-all duration-200 hover:border-accent/40 hover:bg-accent/5 hover:text-accent"><span class="opacity-40">#</span>{{ . }}</a>
+    {{- end }}
+  </div>
+  {{- end }}
+  <div class="flex shrink-0 flex-col items-center gap-2 sm:items-end">
+    <span class="font-cartograph text-[10px] tracking-wider text-foreground/40 uppercase select-none">Share</span>
+    <div class="flex items-center gap-1">
+      {{- with $share.whatsapp }}
+      <a tabindex="0" href="https://wa.me/?text={{ $url }}" target="_blank" rel="noopener noreferrer" title="通过 WhatsApp 分享这篇文章" class="share-btn inline-flex size-8 items-center justify-center rounded-lg border border-border/20 bg-muted/5 transition-all duration-200 hover:border-accent/40 hover:bg-accent/10 hover:text-accent hover:shadow-sm hover:shadow-accent/10"><i class="fa-brands fa-whatsapp text-base leading-none" aria-hidden="true"></i><span class="sr-only">通过 WhatsApp 分享这篇文章</span></a>
+      {{- end }}
+      {{- with $share.facebook }}
+      <a tabindex="0" href="https://www.facebook.com/sharer.php?u={{ $url }}" target="_blank" rel="noopener noreferrer" title="分享到 Facebook" class="share-btn inline-flex size-8 items-center justify-center rounded-lg border border-border/20 bg-muted/5 transition-all duration-200 hover:border-accent/40 hover:bg-accent/10 hover:text-accent hover:shadow-sm hover:shadow-accent/10"><i class="fa-brands fa-facebook-f text-base leading-none" aria-hidden="true"></i><span class="sr-only">分享到 Facebook</span></a>
+      {{- end }}
+      {{- with $share.x }}
+      <a tabindex="0" href="https://x.com/intent/post?url={{ $url }}" target="_blank" rel="noopener noreferrer" title="分享到 X" class="share-btn inline-flex size-8 items-center justify-center rounded-lg border border-border/20 bg-muted/5 transition-all duration-200 hover:border-accent/40 hover:bg-accent/10 hover:text-accent hover:shadow-sm hover:shadow-accent/10"><i class="fa-brands fa-x-twitter text-base leading-none" aria-hidden="true"></i><span class="sr-only">分享到 X</span></a>
+      {{- end }}
+      {{- with $share.telegram }}
+      <a tabindex="0" href="https://t.me/share/url?url={{ $url }}" target="_blank" rel="noopener noreferrer" title="通过 Telegram 分享这篇文章" class="share-btn inline-flex size-8 items-center justify-center rounded-lg border border-border/20 bg-muted/5 transition-all duration-200 hover:border-accent/40 hover:bg-accent/10 hover:text-accent hover:shadow-sm hover:shadow-accent/10"><i class="fa-brands fa-telegram text-base leading-none" aria-hidden="true"></i><span class="sr-only">通过 Telegram 分享这篇文章</span></a>
+      {{- end }}
+      {{- with $share.pinterest }}
+      <a tabindex="0" href="https://pinterest.com/pin/create/button/?url={{ $url }}" target="_blank" rel="noopener noreferrer" title="分享到 Pinterest" class="share-btn inline-flex size-8 items-center justify-center rounded-lg border border-border/20 bg-muted/5 transition-all duration-200 hover:border-accent/40 hover:bg-accent/10 hover:text-accent hover:shadow-sm hover:shadow-accent/10"><i class="fa-brands fa-pinterest-p text-base leading-none" aria-hidden="true"></i><span class="sr-only">分享到 Pinterest</span></a>
+      {{- end }}
+      {{- with $share.email }}
+      <a tabindex="0" href="mailto:?subject=See%20this%20post&amp;body={{ $url }}" target="_blank" rel="noopener noreferrer" title="通过邮件分享这篇文章" class="share-btn inline-flex size-8 items-center justify-center rounded-lg border border-border/20 bg-muted/5 transition-all duration-200 hover:border-accent/40 hover:bg-accent/10 hover:text-accent hover:shadow-sm hover:shadow-accent/10"><i class="fa-solid fa-envelope text-base leading-none" aria-hidden="true"></i><span class="sr-only">通过邮件分享这篇文章</span></a>
+      {{- end }}
+    </div>
+  </div>
+</div>
+
+<div class="my-6 flex items-center gap-3" aria-hidden="true">
+  <div class="h-px flex-1 bg-linear-to-r from-transparent via-border/30 to-transparent"></div>
+</div>
+
+{{- /* 上下篇：Previous=更早 / Next=更新（Hugo 页面集合按时间倒序，NextPage=下一篇更旧，
+     .Prev=更早 / .Next=更新（实测 Hugo 语义；源站 Previous=更早 → 取 .Prev，Next=更新 → 取 .Next） */}}
+<div data-search-ignore class="grid grid-cols-2 gap-3">
+  {{- with .Prev }}
+  <a href="{{ .RelPermalink }}" class="post-nav-link group relative flex flex-col gap-1 rounded-2xl border border-border/20 px-5 py-4 transition-all duration-300 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5">
+    <div class="post-nav-bg"></div>
+    <div class="flex items-center gap-1.5">
+      <svg class="size-3.5 text-accent/50 transition-transform duration-300 group-hover:-translate-x-1 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      <span class="font-cartograph text-[10px] tracking-wider text-foreground/35 uppercase">Previous</span>
+    </div>
+    <span class="line-clamp-2 text-[0.9375rem] leading-snug font-medium text-foreground/70 transition-colors duration-200 group-hover:text-accent">{{ .Title }}</span>
+  </a>
+  {{- end }}
+  {{- with .Next }}
+  <a href="{{ .RelPermalink }}" class="post-nav-link group relative col-start-2 flex flex-col items-end gap-1 rounded-2xl border border-border/20 px-5 py-4 text-end transition-all duration-300 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5">
+    <div class="post-nav-bg"></div>
+    <div class="flex items-center gap-1.5">
+      <span class="font-cartograph text-[10px] tracking-wider text-foreground/35 uppercase">Next</span>
+      <svg class="size-3.5 text-accent/50 transition-transform duration-300 group-hover:translate-x-1 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+    </div>
+    <span class="line-clamp-2 text-[0.9375rem] leading-snug font-medium text-foreground/70 transition-colors duration-200 group-hover:text-accent">{{ .Title }}</span>
+  </a>
+  {{- end }}
+</div>
+
+{{- partial "comment-section.html" . }}

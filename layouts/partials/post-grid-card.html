@@ -1,0 +1,31 @@
+{{- /* 文章页卡片流卡片（posts 列表三列网格，带封面） */}}
+<li class="post-preview-card app-card-interactive app-card-glow card-glow group/card relative rounded-2xl border backdrop-blur-sm focus-within:shadow-lg hover:shadow-lg flex flex-col overflow-hidden border-border/25 bg-[var(--card-bg)] focus-within:border-accent/40 focus-within:bg-accent/5 hover:border-accent/40 hover:bg-accent/5 focus-within:shadow-accent/10 hover:shadow-accent/10">
+  <div class="card-glow-effect" aria-hidden="true"></div>
+  {{- with .Params.cover }}
+  <div class="relative h-44 overflow-hidden" style="mask-image:linear-gradient(to bottom,#000 67%,rgba(0,0,0,0.4) 100%);-webkit-mask-image:linear-gradient(to bottom,#000 67%,rgba(0,0,0,0.4) 100%)" aria-hidden="true">
+    <img src="{{ . }}" alt="" width="640" height="176" class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-105" loading="lazy" decoding="async">
+  </div>
+  {{- end }}
+  <div class="flex flex-1 flex-col p-4 sm:p-5">
+    <a href="{{ .RelPermalink }}" class="rounded-sm font-semibold text-foreground transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none text-[1.125rem] group-hover/card:text-accent focus-visible:ring-accent">
+      <h2 class="truncate">{{ .Title }}</h2>
+      <span class="absolute inset-0 z-10" aria-hidden="true"></span>
+    </a>
+    {{- with .Description }}
+    <p class="mt-2 text-[0.9375rem] leading-relaxed text-foreground/60 line-clamp-3 min-h-[4.5rem]">{{ . }}</p>
+    {{- end }}
+    <div class="mt-3 flex flex-wrap items-center gap-1.5 text-[0.875rem]">
+      {{- with .Params.categories }}
+      {{- range first 1 . }}
+      <a href="{{ "/categories/" }}{{ . | urlize }}/" class="relative z-20 inline-flex items-center gap-1 rounded-full border border-accent/15 bg-accent/8 px-2 py-0.5 text-accent/70 transition-colors hover:border-accent/30 hover:bg-accent/15 hover:text-accent"><i class="fa-solid fa-folder text-[0.875rem] leading-none" aria-hidden="true"></i>{{ . }}</a>
+      {{- end }}
+      {{- end }}
+      {{- range .Params.tags }}
+      <a href="{{ "/tags/" }}{{ . | urlize }}/" class="relative z-20 inline-flex items-center rounded-full border border-border/30 px-2 py-0.5 text-foreground/40 transition-colors hover:border-accent/30 hover:text-accent">#{{ . }}</a>
+      {{- end }}
+    </div>
+    <div class="mt-auto flex justify-end pt-3 text-[0.875rem] text-foreground/40">
+      <span class="inline-flex items-center gap-1.5"><i class="fa-regular fa-calendar-days text-sm leading-none" aria-hidden="true"></i>{{ .Date | time.Format "2006-01-02" }}</span>
+    </div>
+  </div>
+</li>

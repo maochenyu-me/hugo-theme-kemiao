@@ -1,0 +1,35 @@
+{{- /* 我的设备：Hero + 设备分组（数据 front matter groups 优先，data/devices.yaml 兜底） */}}
+{{- define "main" }}
+{{- partial "breadcrumb.html" (dict "label" "Devices") }}
+{{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
+{{- $groups := .Params.groups }}
+{{- if not $groups }}{{ $groups = hugo.Data.devices }}{{ end }}
+<div class="mt-8 space-y-10">
+  {{- range $groups }}
+  <section class="device-group">
+    <div class="device-group-header">
+      <div>
+        <h2 class="device-group-title">{{ .title }}</h2>
+        <p class="device-group-desc">{{ .desc }}</p>
+      </div>
+      {{- with .badge }}<span class="device-group-badge">{{ . }}</span>{{ end }}
+    </div>
+    <div class="device-grid">
+      {{- range .items }}
+      <div class="device-card app-card">
+        <div class="device-cover"><img src="{{ .image }}" alt="{{ .name }}" class="device-image" loading="lazy" decoding="async"></div>
+        <div class="device-info">
+          <div class="device-name">{{ .name }}</div>
+          <div class="device-spec">{{ .spec }}</div>
+          <div class="device-desc">{{ .desc }}</div>
+        </div>
+        {{- with .url }}
+        <div class="device-toolbar"><a href="{{ . }}" target="_blank" rel="noopener noreferrer" class="device-link">详情</a></div>
+        {{- end }}
+      </div>
+      {{- end }}
+    </div>
+  </section>
+  {{- end }}
+</div>
+{{- end }}

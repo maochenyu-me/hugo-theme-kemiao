@@ -1,0 +1,15 @@
+{{- /* 音乐胶囊（源站 nav-music 1:1）：APlayer+MetingJS 懒加载，行为在 assets/js/music-capsule.js */}}
+{{- $music := site.Params.musicCapsule -}}
+{{- if $music.enable }}
+<div id="nav-music" class="needEndHide"
+  data-aplayer-css="{{ $music.aplayerCss | default "https://jsd.liiiu.cn/npm/aplayer@1.10.1/dist/APlayer.min.css" }}"
+  data-aplayer-script="{{ $music.aplayerScript | default "https://jsd.liiiu.cn/npm/aplayer@1.10.1/dist/APlayer.min.js" }}"
+  data-meting-script="{{ $music.metingScript | default "https://jsd.liiiu.cn/npm/meting@2.0.1/dist/Meting.min.js" }}">
+  <button id="nav-music-hoverTips" type="button" data-music-capsule-toggle aria-label="播放音乐">
+    <span class="music-capsule-toggle-icon" aria-hidden="true"><i class="fa-regular fa-circle-play"></i></span>
+  </button>
+  <meting-js id="{{ $music.id }}" server="{{ $music.server }}" type="{{ $music.type | default "playlist" }}"
+    mutex="true" preload="none" data-lrctype="0" order="random" volume="{{ $music.volume | default "0.8" }}"
+    api="{{ $music.api }}"></meting-js>
+</div>
+{{- end }}

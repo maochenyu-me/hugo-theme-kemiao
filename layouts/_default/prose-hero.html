@@ -1,0 +1,7 @@
+{{- /* 通用：Hero + 正文（prose-hero：statement/info 等） */}}
+{{- define "main" }}
+{{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
+{{- with .Content }}
+<section class="app-prose mb-16 max-w-app prose-img:border-0">{{ . }}</section>
+{{- end }}
+{{- end }}

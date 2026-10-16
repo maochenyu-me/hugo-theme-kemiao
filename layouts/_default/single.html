@@ -1,0 +1,30 @@
+{{- /* 文章页：面包屑 / 文章头 / 正文 + 侧栏 / 文章尾区（阶段③） */}}
+{{ define "main" }}
+{{- partial "breadcrumb.html" . }}
+{{- partial "post-header.html" . }}
+<div data-post-outdate-notice data-published-at="{{ .Date.Format "2006-01-02T15:04:05" }}" hidden></div>
+<div class="lg:flex lg:gap-6">
+  <article id="article" class="app-prose mt-8 max-w-none min-w-0 flex-1 prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)">
+    {{- /* 封面：仅本地资源做存在性校验后渲染；远程 URL 直接放行；
+           本地路径找不到文件则整块跳过，避免破图与 404。 */ -}}
+    {{- with .Params.cover }}
+    {{- $cover := . }}
+    {{- $remote := or (hasPrefix $cover "http://") (hasPrefix $cover "https://") (hasPrefix $cover "//") (hasPrefix $cover "data:") }}
+    {{- $ok := or $remote (resources.Get (strings.TrimPrefix "/" $cover)) (fileExists (printf "static%s" $cover)) (fileExists (printf "themes/kemiao/static%s" $cover)) }}
+    {{- if $ok }}
+    <div class="post-cover-image -mt-8" data-no-lightbox>
+      <img src="{{ $cover }}" alt="{{ $.Title }} 封面图" loading="eager">
+    </div>
+    {{- end }}
+    {{- end }}
+    {{ .Content }}
+  </article>
+  {{- partial "post-sidebar.html" . }}
+</div>
+{{- partial "post-footer.html" . }}
+{{- partial "mobile-toc.html" . }}
+{{- with resources.Get "js/article.js" }}
+  {{- $js := . | js.Build (dict "minify" true) | fingerprint }}
+  <script type="module" src="{{ $js.RelPermalink }}"></script>
+{{- end }}
+{{ end }}

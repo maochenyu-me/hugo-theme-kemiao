@@ -1,0 +1,102 @@
+{{- /* 日常说说页三数据源：
+     local → content/shuoshuo 本地内容，构建期渲染
+     api   → memos echo feed（shuoshuo-page.js 拉取）
+     tg    → koharu-suite / Telegram 频道归档（shuoshuo-tg.js 游标分页拉取）
+   三者共用同一套卡片 CSS 与评论区。 */ -}}
+{{- define "main" }}
+{{- $source := site.Params.shuoshuo.source | default "api" }}
+{{- partial "breadcrumb.html" (dict "label" "Shuoshuo") }}
+{{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
+{{- if eq $source "local" }}
+  {{- $pages := where site.RegularPages "Type" "shuoshuo" }}
+  {{- $pinned := sort (where $pages ".Params.pinned" "eq" true) "Date" "desc" }}
+  {{- $rest := sort (where $pages ".Params.pinned" "ne" true) "Date" "desc" }}
+  {{- $shuos := union $pinned $rest }}
+<section class="mt-8">
+  <div id="shuoshuo-feed" class="shuoshuo-feed" data-source="local" aria-live="polite">
+    {{- if not $shuos }}
+    <div class="shuoshuo-feed-state">还没有说说，去 <code>content/shuoshuo/</code> 写下第一条吧。</div>
+    {{- else }}
+    <div class="shuoshuo-feed-list" data-reveal="pending">
+      {{- range $i, $p := $shuos }}
+      <div class="shuoshuo-feed-item shuoshuo-feed-item-reveal" style="--shuoshuo-reveal-index: {{ math.Min $i 12 }}">
+        {{- partial "shuoshuo-card.html" (dict "page" $p) }}
+      </div>
+      {{- end }}
+    </div>
+    {{- end }}
+  </div>
+</section>
+{{- partial "comment-section.html" . }}
+{{- $js := resources.Get "js/shuoshuo-local.js" | js.Build (dict "minify" true) | fingerprint }}
+<script type="module" src="{{ $js.RelPermalink }}"></script>
+{{- else if eq $source "tg" }}
+{{- $tg := site.Params.shuoshuo.tg }}
+<section class="mt-8">
+  <div id="shuoshuo-feed" class="shuoshuo-feed" data-source="tg"
+    data-author="{{ $tg.author | default site.Params.shuoshuo.author }}"
+    data-avatar="{{ $tg.avatar | default site.Params.shuoshuo.avatar }}"
+    data-tg-base="{{ $tg.baseUrl }}"
+    data-tg-channel="{{ $tg.channelId }}"
+    data-tg-page-size="{{ $tg.pageSize | default 12 }}"
+    data-tg-detail-link="{{ $tg.detailLink | default true }}"
+    aria-live="polite">
+    <div class="shuoshuo-feed-state shuoshuo-feed-loading" role="status">
+      <div class="shuoshuo-loading-text">正在加载最近的说说...</div>
+      <div class="shuoshuo-skeleton-list" aria-hidden="true">
+        {{- range $i := seq 3 }}
+        <article class="shuoshuo-skeleton-card" style="--shuoshuo-skeleton-index: {{ sub $i 1 }}">
+          <div class="shuoshuo-skeleton-head">
+            <span class="shuoshuo-skeleton-avatar"></span>
+            <span class="shuoshuo-skeleton-meta">
+              <span class="shuoshuo-skeleton-line shuoshuo-skeleton-line-title"></span>
+              <span class="shuoshuo-skeleton-line shuoshuo-skeleton-line-date"></span>
+            </span>
+          </div>
+          <span class="shuoshuo-skeleton-line"></span>
+          <span class="shuoshuo-skeleton-line shuoshuo-skeleton-line-short"></span>
+          <span class="shuoshuo-skeleton-media"></span>
+        </article>
+        {{- end }}
+      </div>
+    </div>
+  </div>
+</section>
+{{- partial "comment-section.html" . }}
+{{- $js := resources.Get "js/shuoshuo-tg.js" | js.Build (dict "minify" true) | fingerprint }}
+<script type="module" src="{{ $js.RelPermalink }}"></script>
+{{- else }}
+<section class="mt-8">
+  <div id="shuoshuo-feed" class="shuoshuo-feed" data-source="api"
+    data-author="{{ site.Params.shuoshuo.author }}"
+    data-avatar="{{ site.Params.shuoshuo.avatar }}"
+    data-api="{{ site.Params.shuoshuo.api }}"
+    data-media-origin="{{ site.Params.shuoshuo.mediaOrigin }}"
+    data-limit="{{ site.Params.shuoshuo.fetchLimit }}"
+    data-count-id aria-live="polite">
+    <div class="shuoshuo-feed-state shuoshuo-feed-loading" role="status">
+      <div class="shuoshuo-loading-text">正在加载最近的说说...</div>
+      <div class="shuoshuo-skeleton-list" aria-hidden="true">
+        {{- range $i := seq 3 }}
+        <article class="shuoshuo-skeleton-card" style="--shuoshuo-skeleton-index: {{ sub $i 1 }}">
+          <div class="shuoshuo-skeleton-head">
+            <span class="shuoshuo-skeleton-avatar"></span>
+            <span class="shuoshuo-skeleton-meta">
+              <span class="shuoshuo-skeleton-line shuoshuo-skeleton-line-title"></span>
+              <span class="shuoshuo-skeleton-line shuoshuo-skeleton-line-date"></span>
+            </span>
+          </div>
+          <span class="shuoshuo-skeleton-line"></span>
+          <span class="shuoshuo-skeleton-line shuoshuo-skeleton-line-short"></span>
+          <span class="shuoshuo-skeleton-media"></span>
+        </article>
+        {{- end }}
+      </div>
+    </div>
+  </div>
+</section>
+{{- partial "comment-section.html" . }}
+{{- $js := resources.Get "js/shuoshuo-page.js" | js.Build (dict "minify" true) | fingerprint }}
+<script type="module" src="{{ $js.RelPermalink }}"></script>
+{{- end }}
+{{- end }}

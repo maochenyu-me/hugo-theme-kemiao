@@ -1,0 +1,27 @@
+{{- /* 关于我：浮动文字 Hero + 卡片网格正文 */}}
+{{- define "main" }}
+<section class="about-hero" aria-labelledby="about-title" data-aurora-hero>
+  <div class="aurora-orb aurora-orb-1"></div>
+  <div class="aurora-orb aurora-orb-2"></div>
+  <div class="aurora-orb aurora-orb-3"></div>
+  <div class="aurora-mouse" data-aurora-mouse></div>
+  <div class="hero-content">
+    <div class="hero-avatar-row">
+      <div class="float-cloud float-cloud-left" aria-hidden="true">
+        {{- range .Params.floatsLeft }}<span class="float-text">{{ . }}</span>{{ end }}
+      </div>
+      <div class="avatar-ring">
+        <div class="avatar-inner">
+          <img src="{{ .Params.avatar }}" alt="{{ .Params.name }} 的头像" class="about-avatar" loading="eager" decoding="async">
+        </div>
+      </div>
+      <div class="float-cloud float-cloud-right" aria-hidden="true">
+        {{- range .Params.floatsRight }}<span class="float-text">{{ . }}</span>{{ end }}
+      </div>
+    </div>
+    <h1 id="about-title" class="hero-title"><span class="greeting">{{ .Params.greeting }}</span><span class="name-glow">{{ .Params.name }}</span></h1>
+    <p class="hero-motto">{{ .Params.motto }}</p>
+  </div>
+</section>
+{{- with .Content }}{{ . }}{{ end }}
+{{- end }}

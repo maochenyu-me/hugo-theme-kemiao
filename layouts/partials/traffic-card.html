@@ -1,0 +1,35 @@
+{{- /* 流量数据卡（首页右栏与文章侧栏共用） */}}
+<div class="traffic-card app-card app-card-glow card-glow group/sc p-4">
+  <div class="card-glow-effect" aria-hidden="true"></div>
+  <div class="relative z-5">
+    <div class="mb-3 flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <h3 class="flex items-center gap-2 text-[1.125rem] font-bold tracking-wide text-foreground">
+          <i class="fa-solid fa-chart-line text-sm leading-none text-accent/60" aria-hidden="true"></i>流量数据</h3>
+        <p class="mt-1 text-[0.8125rem] leading-snug text-foreground/45">近 24 小时 CDN 流量</p>
+      </div>
+      <span class="mt-0.5 shrink-0 rounded-full border border-accent/18 bg-accent/8 px-2 py-0.5 font-cartograph text-[0.6875rem] font-bold tracking-wide text-accent/70" data-traffic-status>加载中</span>
+    </div>
+    <div class="traffic-waveform mb-3" aria-hidden="true">
+      <svg viewBox="0 0 220 56" role="img">
+        <defs>
+          <linearGradient id="trafficWaveGradient" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.18"></stop>
+            <stop offset="48%" stop-color="var(--accent)" stop-opacity="0.95"></stop>
+            <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.26"></stop>
+          </linearGradient>
+        </defs>
+        <path class="traffic-waveform-grid" d="M0 14H220M0 28H220M0 42H220"></path>
+        <polyline class="traffic-waveform-line" points="0,35 14,34 28,36 42,20 56,39 70,34 84,35 98,12 112,44 126,34 140,35 154,24 168,38 182,33 196,35 220,31" data-traffic-waveform-line></polyline>
+      </svg>
+    </div>
+    <div class="mb-3">
+      <div class="font-cartograph text-[0.75rem] tracking-wider text-foreground/42">流量</div>
+      <div class="font-cartograph text-2xl leading-tight font-black tracking-wide text-foreground" data-traffic-value>--</div>
+    </div>
+    <div class="grid grid-cols-2 gap-2">
+      <div class="traffic-stat"><span class="traffic-stat-label">请求数</span><strong data-request-value>--</strong></div>
+      <div class="traffic-stat"><span class="traffic-stat-label">平均耗时</span><strong data-response-value>--</strong></div>
+    </div>
+  </div>
+</div>

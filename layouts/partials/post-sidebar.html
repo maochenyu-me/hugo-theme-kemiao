@@ -1,0 +1,20 @@
+{{- /* 文章页侧栏：欢迎卡 + 粘性（目录 + 流量 + 网站信息）。目录由 Hugo TableOfContents 生成，
+     JS 会把 Hugo 的嵌套结构补上 data-toc-* 属性（与源站 DOM 一致）。 */}}
+{{- $hasToc := and .IsPage (gt (len .Fragments.Identifiers) 0) -}}
+<aside class="hidden w-[300px] shrink-0 lg:block">
+  {{ partial "welcome-card.html" . }}
+  <div class="sticky top-20 mt-4 flex flex-col gap-4">
+    {{- if $hasToc }}
+    <nav class="sidebar-toc app-card app-card-glow card-glow group/sc p-4" aria-label="目录" data-toc-root>
+      <div class="card-glow-effect" aria-hidden="true"></div>
+      <div class="relative z-5">
+        <div class="sidebar-toc-title">
+          <i class="fa-solid fa-list-ul" aria-hidden="true"></i>目录</div>
+        {{ .TableOfContents }}
+      </div>
+    </nav>
+    {{- end }}
+    {{- if site.Params.sidebar.traffic.enable }}{{ partial "traffic-card.html" . }}{{- end }}
+    {{- if site.Params.sidebar.webinfo.enable }}{{ partial "webinfo-card.html" . }}{{- end }}
+  </div>
+</aside>

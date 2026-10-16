@@ -1,0 +1,30 @@
+{{- /* 分类/标签 term 页简单列表卡片（无封面） */}}
+<li class="post-preview-card app-card-interactive app-card-glow card-glow group/card relative rounded-2xl border backdrop-blur-sm focus-within:shadow-lg hover:shadow-lg my-3 p-4 sm:p-5 border-border/25 bg-[var(--card-bg)] focus-within:border-accent/40 focus-within:bg-accent/5 hover:border-accent/40 hover:bg-accent/5 focus-within:shadow-accent/10 hover:shadow-accent/10">
+  <div class="card-glow-effect" aria-hidden="true"></div>
+  <div class="relative z-5">
+    <a href="{{ .RelPermalink }}" class="rounded-sm font-semibold text-foreground transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none text-[1.25rem] group-hover/card:text-accent focus-visible:ring-accent">
+      <h2>{{ .Title }}</h2>
+      <span class="absolute inset-0 z-10 -inset-4 sm:-inset-5" aria-hidden="true"></span>
+    </a>
+    {{- with .Description }}
+    <p class="mt-2 text-[0.9375rem] leading-relaxed text-foreground/60 line-clamp-2">{{ . }}</p>
+    {{- end }}
+    <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[0.875rem]">
+      <div class="flex items-center gap-x-2 text-foreground/80">
+        <i aria-hidden="true" class="fa-regular fa-calendar-days inline-block leading-none min-w-4 text-base"></i>
+        <span class="sr-only">发布日期: </span>
+        <time datetime="{{ .Date.Format "2006-01-02T15:04:05.000Z07:00" }}" title="{{ .Date | time.Format "2006年1月2日" }}">{{ .Date | time.Format "2006-01-02" }}</time>
+      </div>
+      {{- with .Params.categories }}
+      {{- range first 1 . }}
+      <a href="{{ "/categories/" }}{{ . | urlize }}/" class="relative z-20 inline-flex items-center gap-1 rounded-full border border-accent/15 bg-accent/8 px-2 py-0.5 text-accent/70 transition-colors hover:border-accent/30 hover:bg-accent/15 hover:text-accent"><i class="fa-solid fa-folder text-[0.875rem] leading-none" aria-hidden="true"></i>{{ . }}</a>
+      {{- end }}
+      {{- end }}
+      <div class="flex flex-wrap gap-2.5">
+        {{- range .Params.tags }}
+        <a href="{{ "/tags/" }}{{ . | urlize }}/" class="relative z-20 text-foreground/40 underline decoration-foreground/25 decoration-dashed underline-offset-4 transition-colors hover:text-accent hover:decoration-accent/60">#{{ . }}</a>
+        {{- end }}
+      </div>
+    </div>
+  </div>
+</li>

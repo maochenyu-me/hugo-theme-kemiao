@@ -1,0 +1,42 @@
+{{- /* 首页右栏三卡：欢迎来访者 / 赞赏者轮播 / 流量数据 / 网站信息（lg 以上显示） */}}
+{{- $sb := site.Params.sidebar -}}
+<aside class="hidden w-[300px] shrink-0 lg:block">
+  <div class="flex flex-col gap-4">
+    {{- if $sb.welcome.enable }}{{ partial "welcome-card.html" . }}{{- end }}
+
+    {{- if $sb.patron.enable }}
+    <div class="patron-card app-card app-card-glow card-glow group/sc p-3.5" data-patron-card>
+      <div class="card-glow-effect" aria-hidden="true"></div>
+      <div class="relative z-5">
+        <div class="mb-2.5 flex items-center justify-between gap-3">
+          <h3 class="flex items-center gap-2 text-[1.125rem] font-bold tracking-wide text-foreground">
+            <i class="fa-solid fa-mug-hot text-sm leading-none text-accent/60" aria-hidden="true"></i>赞赏者</h3>
+          <a class="patron-more" href="{{ $sb.patron.moreUrl }}" aria-label="查看全部赞赏者">{{ $sb.patron.moreLabel }}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="patron-carousel" aria-label="赞赏者轮播">
+          {{- range $i, $p := hugo.Data.patrons }}
+          {{- if $p.url }}
+          <a href="{{ $p.url }}" target="_blank" rel="noopener noreferrer" class="patron-slide{{ if eq $i 0 }} patron-slide-active{{ end }}" data-patron-slide>
+          {{- else }}
+          <article class="patron-slide{{ if eq $i 0 }} patron-slide-active{{ end }}" data-patron-slide>
+          {{- end }}
+            <div class="patron-slide-bg" style="background-image:url({{ $p.avatar }})" aria-hidden="true"></div>
+            <div class="patron-slide-main">
+              <img src="{{ $p.avatar }}" alt="" class="patron-avatar" loading="lazy" decoding="async">
+              <div class="min-w-0">
+                <div class="patron-name">{{ $p.name }}</div>
+                <div class="patron-desc">{{ $p.desc }}</div>
+              </div>
+            </div>
+            <div class="patron-slide-foot"><span>¥{{ $p.amount }}</span><span>{{ $p.date }}</span></div>
+          {{- if $p.url }}</a>{{ else }}</article>{{ end }}
+          {{- end }}
+        </div>
+      </div>
+    </div>
+    {{- end }}
+
+    {{- if $sb.traffic.enable }}{{ partial "traffic-card.html" . }}{{- end }}
+    {{- if $sb.webinfo.enable }}{{ partial "webinfo-card.html" . }}{{- end }}
+  </div>
+</aside>

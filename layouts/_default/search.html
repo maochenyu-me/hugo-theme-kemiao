@@ -1,0 +1,38 @@
+{{- /* 独立搜索页：面包屑 simple + Hero + 双后端搜索卡（行为在 assets/js/search-page.js） */}}
+{{- define "main" }}
+{{- $search := site.Params.search }}
+{{- partial "breadcrumb.html" (dict "label" "Search") }}
+{{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "gradient" .Params.hero.gradient) }}
+<section class="search-container app-card mb-16" data-aurora-card>
+  <div class="search-aurora" data-card-aurora aria-hidden="true"></div>
+  <div class="search-border-glow" data-card-border aria-hidden="true"></div>
+  <div class="search-inner">
+    <div id="algolia-search" class="premium-search" data-backurl="/search/"
+      data-search-provider="{{ $search.provider | default "pagefind" }}"
+      {{- with $search.algolia }}
+      data-algolia-app-id="{{ .appId }}"
+      data-algolia-api-key="{{ .apiKey }}"
+      data-algolia-index="{{ .indexName }}"
+      data-algolia-hits-per-page="{{ .hitsPerPage | default 5 }}"
+      {{- end }}
+      {{- with $search.pagefind }}
+      data-pagefind-base-path="{{ .basePath | default "/pagefind/" }}"
+      data-pagefind-hits-per-page="{{ .hitsPerPage | default 5 }}"
+      {{- end }}>
+      <div class="algolia-ui">
+        <form class="algolia-ui__form" role="search">
+          <input class="algolia-ui__search-input" type="text" placeholder="Search" autocomplete="off" autocapitalize="none" spellcheck="false">
+          <button class="algolia-ui__search-clear" type="button" aria-label="清理搜索">
+            <i class="fa-solid fa-broom" aria-hidden="true"></i>
+            <span class="algolia-ui__search-clear-label">清理</span>
+          </button>
+        </form>
+        <div class="algolia-ui__results-area">
+          <p class="algolia-ui__message" aria-live="polite"></p>
+          <ol class="algolia-ui__results"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{{- end }}

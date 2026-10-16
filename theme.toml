@@ -1,0 +1,29 @@
+name = 'kemiao'
+license = 'MIT'
+licenselink = 'https://github.com/Kemeow0815/hugo-kemiao-theme/blob/main/LICENSE'
+description = '克喵移植自 blog.liushen.fun（Astro）的 Hugo 博客主题：毛玻璃质感、双搜索后端（pagefind/algolia）、双评论后端（artalk/twikoo）、中控台、右键菜单、说说、安全跳转、音乐胶囊等全功能复刻。'
+homepage = 'https://github.com/Kemeow0815/hugo-kemiao-theme'
+demosite = 'https://blog.liushen.fun/'
+tags = ['blog', 'glassmorphism', 'dark mode', 'search', 'comments', 'responsive']
+features = [
+  'pagefind/algolia 双搜索后端',
+  'artalk/twikoo 双评论后端',
+  '中控台偏好设置',
+  '自定义右键菜单',
+  '说说动态流',
+  '外链安全跳转中转页',
+  '独立搜索页',
+  '音乐胶囊（APlayer/MetingJS）',
+  '文章过期提醒',
+  '亮暗双主题 + 毛玻璃',
+]
+min_version = '0.166.0'
+
+[author]
+  name = '克喵 (Kemeow0815)'
+  homepage = 'https://github.com/Kemeow0815'
+
+[original]
+  name = 'LiuShen / Willow-God'
+  homepage = 'https://blog.liushen.fun/'
+  repo = 'https://github.com/willow-god/astro-devosfera'

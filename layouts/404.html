@@ -1,0 +1,21 @@
+{{- /* 404 页：1:1 复刻源站 404.html（纯 Tailwind 工具类，零自定义 CSS）
+     源站 DOM：
+       <main id="main-content" class="app-layout flex flex-1 items-center justify-center">
+         <div class="mb-14 flex flex-col items-center justify-center">
+           <h1 class="text-9xl font-bold text-accent">404</h1>
+           <span aria-hidden="true">¯\_(ツ)_/¯</span>
+           <p class="mt-4 text-2xl sm:text-3xl">Page not found</p>
+           <a href="/" class="... my-6 text-lg underline decoration-dashed underline-offset-8">Go back home</a>
+         </div>
+       </main>
+     注意：#main-content 本体由 baseof.html 输出，其 404 专属类
+     （flex flex-1 items-center justify-center）也在 baseof 内按 .Kind 分支注入；
+     本模板只负责它的子内容 div。标题 "404 Not Found | <站名>" 由 head.html 处理。 */ -}}
+{{- define "main" }}
+<div class="mb-14 flex flex-col items-center justify-center">
+  <h1 class="text-9xl font-bold text-accent">404</h1>
+  <span aria-hidden="true">¯\_(ツ)_/¯</span>
+  <p class="mt-4 text-2xl sm:text-3xl">Page not found</p>
+  <a tabindex="0" href="{{ site.Home.RelPermalink }}" class="group inline-flex items-center gap-1 hover:text-accent my-6 text-lg underline decoration-dashed underline-offset-8">Go back home</a>
+</div>
+{{- end }}

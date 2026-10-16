@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{{- partial "theme-script.html" . -}}
+<head>
+  {{- partial "head.html" . -}}
+</head>
+<body class="flex min-h-screen flex-col">
+  <div id="site-snackbar-root" class="site-snackbar-box" data-site-message-avatar="{{ site.Params.avatar }}" data-site-message-title="站内消息" aria-live="polite" aria-atomic="false"></div>
+  <div id="site-context-menu-root" class="site-context-menu-host" aria-hidden="true"></div>
+  {{- partial "backdrop.html" . -}}
+  <div class="site-swup-overlay pointer-events-none" aria-hidden="true"></div>
+  <div class="site-scroll-progress pointer-events-none" aria-hidden="true">
+    <span data-scroll-progress-bar></span>
+  </div>
+  <div class="site-swup-progress pointer-events-none" aria-hidden="true"><span></span></div>
+
+  <main id="swup" class="site-swup-page transition-fade flex flex-1 flex-col" data-swup-root>
+    <a id="skip-to-content" href="#main-content" class="absolute start-16 -top-full z-50 rounded-b-lg bg-accent px-4 py-2 font-medium text-background transition-all focus:top-0">跳转到内容</a>
+    {{- partial "header.html" . }}
+    {{- /* #main-content 的附加类：404 页需要居中弹性布局（对齐源站 DOM：
+           <main id="main-content" class="app-layout flex flex-1 items-center justify-center">） */}}
+    {{- $mainExtra := "" -}}
+    {{- if eq .Kind "404" }}{{ $mainExtra = "flex flex-1 items-center justify-center" }}{{ else if .IsPage }}{{ $mainExtra = "pb-12" }}{{ end }}
+    <main id="main-content" data-layout="{{ .Layout | default "default" }}" class="relative app-layout{{ with $mainExtra }} {{ . }}{{ end }}"{{ if .IsPage }} data-search-body{{ end }}>
+      {{- block "main" . }}{{ end -}}
+    </main>
+    {{- partial "footer.html" . -}}
+  </main>
+
+  {{- /* 音乐胶囊（源站位置：main 之后、body 末尾区） */}}
+  {{- partial "music-capsule.html" . -}}
+
+  {{- /* 源站 DOM 无 .site-cursor-glow 元素（仅 CSS/JS 遗留），不渲染，避免绝对定位 800px 撑高文档 */}}
+
+  {{- /* 不蒜子统计（soxft/busuanzi 自部署版）：延迟注入器。
+       ① src 走配置（此前硬编码源站地址，[params.busuanzi].src 从未生效——已修）；
+       ② 注入 <script src src> 后，脚本自身会 POST data-api 并填充
+          #busuanzi_{site_pv,site_uv,page_pv,page_uv}（默认前缀恰好与主题 DOM 一致）；
+       ③ site:page-load 时重注入脚本以便 pjax/SPA 场景重新计数。 */}}
+  {{- if site.Params.busuanzi.enable }}
+  <script>
+    (function () {
+      const src = "{{ site.Params.busuanzi.src | default "https://bsz.518339.xyz/js" }}";
+      let refreshTimer;
+      function refreshBusuanzi() {
+        if (!document.querySelector("#busuanzi_site_uv, #busuanzi_site_pv, #busuanzi_page_pv, #busuanzi_page_uv")) return;
+        if (refreshTimer) clearTimeout(refreshTimer);
+        refreshTimer = setTimeout(() => {
+          document.getElementById("busuanzi-script")?.remove();
+          const script = document.createElement("script");
+          script.id = "busuanzi-script";
+          script.async = true;
+          script.src = src + "?v=" + Date.now();
+          document.body.appendChild(script);
+          refreshTimer = undefined;
+        }, 50);
+      }
+      document.addEventListener("site:page-load", refreshBusuanzi);
+      refreshBusuanzi();
+    })();
+  </script>
+  {{- end }}
+
+  {{- /* 搜索弹窗（阶段⑤）：源站位于 body 末尾、site.js 之前 */}}
+  {{- partial "search-modal.html" . -}}
+
+  {{- with resources.Get "js/site.js" }}
+    {{- $js := . | js.Build (dict "minify" true) | fingerprint }}
+    <script type="module" src="{{ $js.RelPermalink }}"></script>
+  {{- end -}}
+</body>
+</html>

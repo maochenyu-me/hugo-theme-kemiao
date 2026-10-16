@@ -1,0 +1,25 @@
+{{- /* 中控台应用列表按钮（more-app），数据来自 data/apps.yaml */}}
+<div class="more-app-btn" aria-label="更多网站">
+  <span class="more-app-trigger" aria-hidden="true">
+    <i class="fa-solid fa-fingerprint text-base leading-none" aria-hidden="true"></i>
+  </span>
+  <div class="more-app-list-groups">
+    <div class="more-app-list-groups-container">
+    {{- range $group := hugo.Data.apps }}
+    <div class="more-app-list-group">
+      <div class="more-app-list-title">{{ $group.title }}</div>
+      <div class="more-app-list">
+        {{- range $item := $group.items }}
+        <a class="more-app-list-item" href="{{ $item.url }}" rel="nofollow noopener" target="_blank">
+          <span class="more-app-item-icon">
+            <i class="{{ $item.icon }} text-[0.875rem] leading-none" aria-hidden="true"></i>
+          </span>
+          <span class="more-app-item-text">{{ $item.name }}</span>
+        </a>
+        {{- end }}
+      </div>
+    </div>
+    {{- end }}
+    </div>
+  </div>
+</div>

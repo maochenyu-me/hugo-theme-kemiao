@@ -1,0 +1,74 @@
+{{- /* 中控台：最近评论 + 标签/分类速览 + 站点偏好操作（行为在 assets/js/control-console.js） */}}
+{{- $provider := site.Params.comments.provider | default "artalk" -}}
+{{- $artalk := site.Params.comments.artalk -}}
+{{- $server := $artalk.server | default "" -}}
+{{- $siteName := $artalk.site | default site.Title -}}
+{{- $origin := site.BaseURL -}}
+{{- $tags := site.Taxonomies.tags.ByCount | first 20 -}}
+{{- $cats := site.Taxonomies.categories.ByCount -}}
+<div id="site-control-console" data-control-console-overlay class="control-console-overlay" aria-hidden="true">
+  <button type="button" data-control-console-close class="control-console-backdrop" aria-label="关闭中控台"></button>
+  <section data-control-console-panel class="control-console-panel" aria-label="站点中控台">
+    <div class="control-console-content">
+      {{- if ne $provider "ecoku" }}
+      <section class="control-console-section control-console-recent">
+        <div class="control-console-section-title"><i class="fa-regular fa-comments" aria-hidden="true"></i>最近评论</div>
+        <div class="control-console-recent-host" data-recent-comments-host data-recent-comments-variant="console"
+          data-server="{{ $server }}" data-site="{{ $siteName }}" data-site-origin="{{ $origin }}"
+          data-display-count="10" data-fetch-count="20">
+          <ul class="recent-comments-list control-console-recent-grid">
+            <li class="control-console-comment-empty">加载中...</li>
+          </ul>
+        </div>
+      </section>
+      {{- end }}
+      <section class="control-console-section control-console-taxonomy">
+        <div class="control-console-section-title"><i class="fa-solid fa-hashtag" aria-hidden="true"></i>标签</div>
+        <div class="control-console-tags" aria-label="标签">
+          {{- range $tags }}
+          <a href="{{ .Page.RelPermalink }}" class="control-console-taxonomy-chip control-console-tag">
+            <span class="control-console-chip-name">{{ .Page.Title }}</span>
+            <span class="control-console-tag-count">{{ .Count }}</span>
+          </a>
+          {{- end }}
+        </div>
+      </section>
+      <section class="control-console-section control-console-taxonomy">
+        <div class="control-console-section-title"><i class="fa-solid fa-folder" aria-hidden="true"></i>分类</div>
+        <div class="control-console-categories" aria-label="分类">
+          {{- range $cats }}
+          <a href="{{ .Page.RelPermalink }}" class="control-console-taxonomy-chip control-console-category">
+            <span class="control-console-chip-name">{{ .Page.Title }}</span>
+            <span class="control-console-tag-count">{{ .Count }}</span>
+          </a>
+          {{- end }}
+        </div>
+      </section>
+    </div>
+    <div class="control-console-actions">
+      <button type="button" data-control-console-action="musicCapsule" class="control-console-action" aria-pressed="true" title="音乐胶囊">
+        <i class="fa-solid fa-music" aria-hidden="true"></i>
+      </button>
+      {{- if ne $provider "ecoku" }}
+      <button type="button" data-control-console-action="recentComments" class="control-console-action" aria-pressed="true" title="最近评论">
+        <i class="fa-regular fa-comments" aria-hidden="true"></i>
+      </button>
+      {{- end }}
+      <button type="button" data-control-console-action="theme" data-theme-mode="auto" class="control-console-action control-console-theme-action" title="亮暗模式">
+        <i data-control-console-theme-icon="auto" class="fa-solid fa-circle-half-stroke control-console-theme-icon" aria-hidden="true"></i>
+        <i data-control-console-theme-icon="light" class="fa-regular fa-sun control-console-theme-icon" aria-hidden="true"></i>
+        <i data-control-console-theme-icon="dark" class="fa-regular fa-moon control-console-theme-icon" aria-hidden="true"></i>
+      </button>
+      <button type="button" data-control-console-action="fullscreen" data-fullscreen-state="enter" class="control-console-action control-console-fullscreen-action" title="进入全屏" aria-label="进入全屏">
+        <i data-control-console-fullscreen-icon="enter" class="fa-solid fa-expand control-console-fullscreen-icon" aria-hidden="true"></i>
+        <i data-control-console-fullscreen-icon="exit" class="fa-solid fa-compress control-console-fullscreen-icon" aria-hidden="true"></i>
+      </button>
+      <button type="button" data-control-console-action="contextMenu" class="control-console-action" aria-pressed="true" title="右键菜单">
+        <i class="fa-solid fa-computer-mouse" aria-hidden="true"></i>
+      </button>
+      <button type="button" data-control-console-action="yozaiFont" class="control-console-action" aria-pressed="true" title="悠哉文楷">
+        <i class="fa-brands fa-fonticons-fi" aria-hidden="true"></i>
+      </button>
+    </div>
+  </section>
+</div>

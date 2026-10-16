@@ -1,0 +1,87 @@
+{{- /* 站内搜索弹窗：双后端（pagefind | algolia），行为在 assets/js/search-modal.js */}}
+{{- $search := site.Params.search -}}
+<div id="search-modal" class="search-modal-overlay" role="dialog" aria-modal="true" aria-label="Search the site">
+  <div class="search-modal-backdrop" data-search-close></div>
+  <div class="search-modal-container" data-modal-card>
+    <!-- Aurora orbs background -->
+    <div class="modal-aurora" aria-hidden="true">
+      <div class="modal-aurora-orb modal-aurora-orb-1"></div>
+      <div class="modal-aurora-orb modal-aurora-orb-2"></div>
+      <div class="modal-aurora-orb modal-aurora-orb-3"></div>
+    </div>
+    <!-- Cursor-follow glow -->
+    <div class="modal-cursor-glow" data-modal-glow aria-hidden="true"></div>
+    <!-- Sparkles -->
+    <div class="modal-sparkles" aria-hidden="true">
+      <div class="sparkle sparkle-1"></div>
+      <div class="sparkle sparkle-2"></div>
+      <div class="sparkle sparkle-3"></div>
+      <div class="sparkle sparkle-4"></div>
+      <div class="sparkle sparkle-5"></div>
+    </div>
+    <!-- Animated border glow -->
+    <div class="modal-border-glow" aria-hidden="true"></div>
+    <!-- Header -->
+    <div class="search-modal-header">
+      <div class="search-modal-title">
+        <span class="search-icon-ring">
+          <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
+        <span class="search-title-text">Search</span>
+      </div>
+      <div class="search-modal-shortcuts">
+        <kbd class="kbd-key">⌘</kbd><kbd class="kbd-key">K</kbd>
+        <span class="shortcuts-sep">·</span>
+        <kbd class="kbd-key">esc</kbd>
+        <span class="shortcuts-label">close</span>
+      </div>
+      <button class="search-modal-close" data-search-close aria-label="Close search">
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <!-- Search body -->
+    <div class="search-modal-body">
+      <div id="modal-search" class="premium-search"
+        data-search-provider="{{ $search.provider | default "pagefind" }}"
+        {{- with $search.algolia }}
+        data-algolia-app-id="{{ .appId }}"
+        data-algolia-api-key="{{ .apiKey }}"
+        data-algolia-index="{{ .indexName }}"
+        data-algolia-hits-per-page="{{ .hitsPerPage | default 5 }}"
+        {{- end }}
+        {{- with $search.pagefind }}
+        data-pagefind-base-path="{{ .basePath | default "/pagefind/" }}"
+        data-pagefind-hits-per-page="{{ .hitsPerPage | default 5 }}"
+        {{- end }}>
+        <div class="algolia-ui">
+          <form class="algolia-ui__form" role="search">
+            <input class="algolia-ui__search-input" type="text" placeholder="Search" autocomplete="off" autocapitalize="none" spellcheck="false">
+            <button class="algolia-ui__search-clear" type="button" aria-label="清理搜索">
+              <i class="fa-solid fa-broom" aria-hidden="true"></i>
+              <span class="algolia-ui__search-clear-label">清理</span>
+            </button>
+          </form>
+          <div class="algolia-ui__results-area">
+            <p class="algolia-ui__message" aria-live="polite"></p>
+            <ol class="algolia-ui__results"></ol>
+          </div>
+        </div>
+      </div>
+      <!-- Empty state illustration -->
+      <div class="search-empty-state" data-search-empty>
+        <div class="empty-icon">
+          <svg class="size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+        <p class="empty-text">Type to search for articles, tutorials, and ideas...</p>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div class="search-modal-footer">
+      <div class="footer-hint"><span class="footer-icon">↵</span> open</div>
+      <div class="footer-hint"><span class="footer-icon">↑↓</span> navigate</div>
+      <div class="footer-powered" aria-label="Site search">
+        <span class="algolia-mark" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span>powered by <strong>{{ $search.provider | default "pagefind" }}</strong>
+      </div>
+    </div>
+  </div>
+</div>

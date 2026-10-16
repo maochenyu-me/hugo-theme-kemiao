@@ -1,0 +1,5 @@
+{{- /* 订阅页：Hero + 订阅卡片正文（复制按钮由 subscribe.js 处理） */}}
+{{- define "main" }}
+{{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
+{{- with .Content }}{{ . }}{{ end }}
+{{- end }}

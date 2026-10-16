@@ -1,0 +1,42 @@
+{{- /* 移动端导航抽屉：6 个 details 分组 + 交错入场动画（--i） */}}
+<div id="mobile-menu" class="mobile-menu lg:hidden" aria-hidden="true">
+  <button class="mobile-menu-backdrop" type="button" aria-label="关闭菜单"></button>
+  <aside class="mobile-menu-panel" aria-label="移动端导航菜单">
+    <div class="mobile-menu-inner">
+      <div class="mobile-menu-head">
+        <div>
+          <div class="mobile-menu-eyebrow">Menu</div>
+          <div class="mobile-menu-title">站点导航</div>
+        </div>
+        <button class="mobile-menu-close" type="button" aria-label="关闭菜单">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+      <nav class="mobile-nav-groups" aria-label="移动端导航">
+        {{- range $index, $group := hugo.Data.nav }}
+        <details class="mobile-nav-group" style="--i:{{ $index }}">
+          <summary class="mobile-nav-group-trigger">
+            <span class="mobile-nav-group-main">
+              <i class="{{ $group.trigger_icon }} mobile-nav-icon" aria-hidden="true"></i>
+              <span>{{ $group.name }}</span>
+            </span>
+            <i class="fa-solid fa-chevron-down mobile-nav-chevron" aria-hidden="true"></i>
+          </summary>
+          <div class="mobile-nav-links">
+            {{- range $item := $group.links }}
+            {{- if $item.external }}
+            <a href="{{ $item.url }}" target="_blank" rel="noopener" class="mobile-nav-link">
+            {{- else }}
+            <a href="{{ $item.url }}" class="mobile-nav-link">
+            {{- end }}
+              <i class="{{ $item.icon }} mobile-nav-link-icon" aria-hidden="true"></i>
+              <span>{{ $item.name }}</span>
+            </a>
+            {{- end }}
+          </div>
+        </details>
+        {{- end }}
+      </nav>
+    </div>
+  </aside>
+</div>

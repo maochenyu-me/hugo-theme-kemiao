@@ -1,0 +1,55 @@
+{{- /* 归档页：按年/月分组（GroupByDate） */}}
+{{- define "main" }}
+{{- $pages := where site.RegularPages "Type" "posts" }}
+{{- $span := 1 }}
+{{- if $pages }}
+  {{- $oldest := index ($pages.ByDate) 0 }}
+  {{- $span = sub (time.Now).Year $oldest.Date.Year }}
+  {{- if lt $span 1 }}{{ $span = 1 }}{{ end }}
+{{- end }}
+{{- partial "page-hero.html" (dict
+    "title" "归档"
+    "desc" "按时间顺序整理的所有文章。"
+    "badges" (slice (dict "text" (printf "%d 篇文章" (len $pages))) (dict "text" (printf "%d年" $span)))
+    "gradient" false) }}
+{{- $monthNames := slice "一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月" }}
+<div class="timeline">
+  {{- range $pages.GroupByDate "2006" }}
+  <div class="year-section">
+    <div class="year-marker" data-aurora-card>
+      <div class="year-aurora" data-card-aurora></div>
+      <span class="year-label">{{ .Key }}</span>
+      <span class="year-count">{{ len .Pages }}</span>
+    </div>
+    {{- range .Pages.GroupByDate "01" }}
+    {{- $mi := sub (int (strings.TrimPrefix "0" .Key)) 1 }}
+    <div class="month-section">
+      <div class="month-header">
+        <span class="month-name">{{ index $monthNames $mi }}</span>
+        <span class="month-count">{{ len .Pages }}</span>
+        <div class="month-line"></div>
+      </div>
+      <div class="posts-list">
+        {{- range .Pages }}
+        <a href="{{ .RelPermalink }}" class="post-card app-card group" data-aurora-card>
+          <div class="card-aurora" data-card-aurora></div>
+          <div class="card-border-glow" data-card-border></div>
+          <div class="post-dot"></div>
+          <div class="post-inner">
+            <div class="post-day">{{ .Date.Format "02" }}</div>
+            <div class="post-info">
+              <span class="post-title flex items-center gap-2">{{ .Title }}</span>
+              {{- with .Description }}
+              <p class="post-desc">{{ . }}</p>
+              {{- end }}
+            </div>
+          </div>
+        </a>
+        {{- end }}
+      </div>
+    </div>
+    {{- end }}
+  </div>
+  {{- end }}
+</div>
+{{- end }}

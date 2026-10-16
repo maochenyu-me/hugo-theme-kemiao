@@ -1,0 +1,57 @@
+{{- /* 分类/标签落地页 + 单个分类/标签文章列表（term 页在本版本会回退到此模板） */}}
+{{- define "main" }}
+{{- if eq .Kind "term" }}
+<div>
+  {{- if eq .Data.Plural "categories" }}
+  <h1 class="text-2xl font-semibold sm:text-3xl">分类：<span>{{ .Title }}</span></h1>
+  <p class="mt-2 mb-6 italic">“{{ .Title }}”分类下的全部文章。</p>
+  {{- else }}
+  <h1 class="text-2xl font-semibold sm:text-3xl">Tag:<span>{{ .Title }}</span></h1>
+  <p class="mt-2 mb-6 italic">All the articles with the tag &ldquo;{{ .Title }}&rdquo;.</p>
+  {{- end }}
+  <ul>
+    {{- range .Pages.ByDate.Reverse }}
+    {{- partial "post-row-card.html" . }}
+    {{- end }}
+  </ul>
+</div>
+{{- else if eq .Kind "taxonomy" }}
+{{- $label := "" }}
+{{- $desc := "" }}
+{{- if eq .Data.Plural "categories" }}
+  {{- $label = "分类" }}
+  {{- $desc = "按内容脉络整理文章，每个分类都是一条清晰的阅读路径。" }}
+{{- else }}
+  {{- $label = "标签" }}
+  {{- $desc = "探索所有博客主题，每个标签都是一个内容宇宙。" }}
+{{- end }}
+{{- $unit := "个标签" }}
+{{- if eq $label "分类" }}{{ $unit = "个分类" }}{{ end }}
+{{- partial "page-hero.html" (dict
+    "title" $label
+    "desc" $desc
+    "badges" (slice
+      (dict "text" (printf "%d %s" (len .Data.Terms) $unit))
+      (dict "text" (printf "%d 篇文章" (len site.RegularPages))))
+    "gradient" false) }}
+<div class="tags-grid">
+  {{- range .Data.Terms.ByCount }}
+  <a href="{{ .Page.RelPermalink }}" class="tag-card group" data-aurora-card>
+    <div class="card-aurora" data-card-aurora></div>
+    <div class="card-border-glow" data-card-border></div>
+    <div class="tag-content">
+      <div class="flex items-center gap-1.5">
+        <i class="fa-solid fa-hashtag text-xl leading-none text-accent opacity-60 transition-opacity group-hover:opacity-100" aria-hidden="true"></i>
+        <span class="tag-name">{{ .Page.Title }}</span>
+      </div>
+      <div class="tag-count">
+        <span class="tag-count-number">{{ .Count }}</span>
+        <span class="tag-count-label">篇</span>
+      </div>
+    </div>
+    <div class="tag-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+  </a>
+  {{- end }}
+</div>
+{{- end }}
+{{- end }}

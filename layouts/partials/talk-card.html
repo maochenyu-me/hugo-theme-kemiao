@@ -1,0 +1,60 @@
+{{- /*
+  说说跑马灯卡：3s 轮换，is-active/is-leaving 类由 home.js 驱动（与源站 home-ticker 1:1）。
+  数据源随 params.shuoshuo.source 切换：
+    local → content/shuoshuo 最新 N 条（图标按字段推断）
+    tg    → 空列表 + data-tg-*，由 home.js 运行时拉取最新 N 条填充
+    api   → data/shuoshuoTicker.yaml（静态）
+*/ -}}
+{{- $source := site.Params.shuoshuo.source | default "api" }}
+{{- $tg := site.Params.shuoshuo.tg }}
+<section id="bber-talk" class="pb-6" aria-label="说说"
+  {{- if eq $source "tg" }} data-tg-ticker data-tg-base="{{ $tg.baseUrl }}" data-tg-channel="{{ $tg.channelId }}" data-tg-count="{{ site.Params.shuoshuo.tickerCount | default 5 }}"{{ end }}>
+  <a href="/shuoshuo/" class="talk-card app-card-interactive app-card-glow card-glow group/talk relative block overflow-hidden rounded-2xl border border-border/25 bg-[var(--card-bg)] py-2 pr-3 pl-2 backdrop-blur-sm hover:border-accent/40 hover:bg-accent/5 hover:shadow-lg hover:shadow-accent/10 focus-visible:ring-2 focus-visible:ring-accent/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none sm:py-2.5 sm:pr-4 sm:pl-2.5">
+    <div class="card-glow-effect" aria-hidden="true"></div>
+    <div class="relative z-10 flex items-center gap-2.5">
+      <span class="talk-icon inline-flex size-8 shrink-0 items-center justify-center rounded-xl border border-border/25 bg-[var(--card-bg)] text-foreground/70 transition-colors duration-300 group-hover/talk:border-accent/25 group-hover/talk:bg-accent/10 group-hover/talk:text-accent">
+        <i class="fa-regular fa-comment-dots text-sm leading-none" aria-hidden="true"></i>
+      </span>
+      <div class="talk-viewport min-w-0 flex-1" aria-live="polite">
+        <ul class="talk-list">
+          {{- if eq $source "local" }}
+          {{- $count := int (site.Params.shuoshuo.tickerCount | default 5) }}
+          {{- $pages := where site.RegularPages "Type" "shuoshuo" }}
+          {{- range $i, $p := first $count (sort $pages "Date" "desc") }}
+          {{- $text := $p.Summary | plainify | chomp | replaceRE "\\s+" " " | truncate 64 }}
+          <li class="item{{ if eq $i 0 }} is-active{{ end }}">
+            <span class="talk-text">{{ if $text }}{{ $text }}{{ else }}分享了一条说说{{ end }}</span>
+            {{- $icons := slice }}
+            {{- with $p.Params.images }}{{ $icons = $icons | append "fa-solid fa-image" }}{{ end }}
+            {{- with $p.Params.video }}{{ $icons = $icons | append "fa-solid fa-film" }}{{ end }}
+            {{- with $p.Params.github }}{{ $icons = $icons | append "fa-brands fa-github" }}{{ end }}
+            {{- with $p.Params.website }}{{ $icons = $icons | append "fa-solid fa-link" }}{{ end }}
+            {{- with $p.Params.location }}{{ $icons = $icons | append "fa-solid fa-location-dot" }}{{ end }}
+            {{- with $icons }}
+            <span class="talk-resource-icons">
+              {{- range . }}<i class="{{ . }}" aria-hidden="true"></i>{{ end }}
+            </span>
+            {{- end }}
+          </li>
+          {{- end }}
+          {{- else if eq $source "tg" }}
+          {{- /* 运行时由 home.js 填充（拉 tg 最新 tickerCount 条） */}}
+          <li class="item is-active"><span class="talk-text">正在加载最近的说说...</span></li>
+          {{- else }}
+          {{- range $i, $t := hugo.Data.shuoshuoTicker }}
+          <li class="item{{ if eq $i 0 }} is-active{{ end }}">
+            <span class="talk-text">{{ $t.text }}</span>
+            {{- with $t.icons }}
+            <span class="talk-resource-icons">
+              {{- range . }}<i class="{{ . }}" aria-hidden="true"></i>{{ end }}
+            </span>
+            {{- end }}
+          </li>
+          {{- end }}
+          {{- end }}
+        </ul>
+      </div>
+      <i class="fa-solid fa-arrow-right shrink-0 text-sm leading-none text-foreground/35 transition-all duration-300 group-hover/talk:translate-x-0.5 group-hover/talk:text-accent" aria-hidden="true"></i>
+    </div>
+  </a>
+</section>

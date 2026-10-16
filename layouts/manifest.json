@@ -1,0 +1,21 @@
+{{- /* PWA manifest：参数化生成，配置见 hugo.toml [params.pwa]。
+       注意：本文件必须保持「输出即 JSON」，不要加入换行缩进以外的内容。 */ -}}
+{{- $pwa := site.Params.pwa | default dict -}}
+{{- $sizes := slice 36 48 72 96 144 192 256 384 512 -}}
+{{- $icons := slice -}}
+{{- range $sizes -}}
+  {{- $icons = $icons | append (dict "src" (printf "/pwa/favicon-%dx%d.png" . .) "sizes" (printf "%dx%d" . .) "type" "image/png") -}}
+{{- end -}}
+{{- $m := dict
+  "lang" (site.Language.Lang | default "zh-CN")
+  "name" (site.Title)
+  "short_name" ($pwa.shortName | default site.Title)
+  "description" (site.Params.description | default site.Title)
+  "theme_color" ($pwa.themeColor | default "#242424")
+  "background_color" ($pwa.backgroundColor | default "#242424")
+  "display" ($pwa.display | default "standalone")
+  "scope" "/"
+  "start_url" ($pwa.startUrl | default "/")
+  "icons" $icons
+-}}
+{{- $m | jsonify (dict "indent" "  ") -}}

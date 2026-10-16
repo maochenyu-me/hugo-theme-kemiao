@@ -1,0 +1,60 @@
+{{- /* 友链页：数据来自页面 front matter（groups）或 data/links.yaml 兜底 */}}
+{{- define "main" }}
+{{- $data := .Params.links }}
+{{- if not $data }}{{ $data = hugo.Data.links }}{{ end }}
+{{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" true) }}
+<div class="mt-8 space-y-8" data-fc-status-api="{{ site.Params.fcircle.statusApi }}">
+  {{- range $data.groups }}
+  <section class="friend-group">
+    <div class="friend-group-header">
+      <div>
+        <h2 class="friend-group-title">{{ .title }}</h2>
+        <p class="friend-group-desc">{{ .desc }}</p>
+      </div>
+      {{- with .badge }}<span class="friend-group-badge">{{ . }}</span>{{ end }}
+    </div>
+    {{- if .sites }}
+    <div class="friend-grid">
+      {{- range .sites }}
+      {{- $s := . }}
+      <div class="friend-card app-card group/card{{ if not $s.siteshot }} friend-card-simple{{ end }}" data-href="{{ $s.url }}" role="link" tabindex="0">
+        <div class="friend-card-glow" aria-hidden="true"></div>
+        {{- with $s.siteshot }}
+        <div class="friend-siteshot" aria-hidden="true"><img src="{{ . }}" alt="" loading="lazy" decoding="async"></div>
+        {{- end }}
+        <div class="friend-body">
+          <div class="friend-main">
+            <div class="friend-avatar-wrap">
+              <img src="{{ $s.avatar }}" alt="{{ $s.name }} 的头像" class="friend-avatar" loading="lazy" decoding="async">
+              {{- with $s.linkPage }}
+              <a href="{{ . }}" target="_blank" rel="nofollow noopener noreferrer" class="friend-avatar-overlay" aria-label="{{ $s.name }} 的友链页">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              </a>
+              {{- end }}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="friend-name">{{ $s.name }}</div>
+              <div class="friend-host">{{ $s.host }}</div>
+            </div>
+          </div>
+          <p class="friend-desc">{{ $s.desc }}</p>
+        </div>
+      </div>
+      {{- end }}
+    </div>
+    {{- end }}
+  </section>
+  {{- end }}
+  {{- with $data.tombstone }}
+  <section class="friend-group">
+    <div class="friend-group-header">
+      <div>
+        <h2 class="friend-group-title">🪵 友链墓碑 · 相逢何必曾相识</h2>
+        <div class="tombstone-desc"><blockquote><p>{{ . | markdownify }}</p></blockquote></div>
+      </div>
+    </div>
+  </section>
+  {{- end }}
+</div>
+{{- partial "comment-section.html" . }}
+{{- end }}

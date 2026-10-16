@@ -1,0 +1,27 @@
+{{- /* 安全跳转中转页（源站 safego 1:1）：解析 ?u= base64 → 倒计时外跳，行为在 assets/js/safego.js */}}
+{{- define "main" }}
+{{- $safego := site.Params.safego }}
+<main class="safego-page">
+  <section class="safego-card app-card" data-safego
+    data-param="{{ $safego.param | default "u" }}"
+    data-countdown="{{ $safego.countdown | default 10 }}"
+    data-protocols="{{ $safego.protocols | default "http,https,thunder,qqdl,ed2k,flashget,qbrowser,ftp,rtsp,mms" }}">
+    <div class="safego-avatar-wrap">
+      <img src="{{ site.Params.avatar }}" alt="" class="safego-avatar" loading="eager" decoding="async">
+    </div>
+    <div class="safego-kicker">{{ site.Title }} · 安全中心</div>
+    <h1>即将离开本站</h1>
+    <p class="safego-desc">你将访问站外链接，请自行确认目标页面的安全性与可信度。</p>
+    <div class="safego-url-box">
+      <span id="safego-url">正在解析目标地址...</span>
+      <button type="button" data-safego-copy aria-label="复制链接"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+    </div>
+    <p class="safego-tip" data-safego-tip>将在 <strong data-safego-count>10</strong> 秒后自动跳转</p>
+    <div class="safego-progress" aria-hidden="true"><span data-safego-progress></span></div>
+    <div class="safego-actions">
+      <button type="button" data-safego-cancel>取消跳转</button>
+      <button type="button" data-safego-jump>立即跳转</button>
+    </div>
+  </section>
+</main>
+{{- end }}
