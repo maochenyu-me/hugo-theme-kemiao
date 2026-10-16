@@ -14,6 +14,9 @@
 <link rel="stylesheet" href="{{ $main.RelPermalink }}">
 {{- with $siteCss }}{{- $siteCssMin := . | minify | fingerprint }}<link rel="stylesheet" href="{{ $siteCssMin.RelPermalink }}">{{ end }}
 
+{{- /* 页面背景：由 [params.background] 渲染出覆盖样式表，必须排在上面三个样式表之后才压得动 */}}
+{{- partial "background-style.html" . -}}
+
 {{- /* 图标：local 自托管（static/fontawesome/），可切 cdn 回源站同款外链 */}}
 {{- if eq ($site.icons.provider | default "local") "cdn" }}
 <link rel="preconnect" href="https://jsd.liiiu.cn" crossorigin>

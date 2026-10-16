@@ -1,0 +1,75 @@
+{{- /* ============================================================================
+  页面背景（可配置）· 数据源 hugo.toml 的 [params.background]
+
+  这里把配置渲染成一张独立的覆盖样式表（Hugo Pipes，指纹化），由 head.html
+  排在 footer.css / site.css 之后引入。footer.css 里内置的那套默认背景规则
+  保留作兜底：整段 [params.background] 删掉即回到主题内置表现，主题可独立分发。
+
+  选择器与 footer.css 完全同构，靠「后出现」取胜：
+    亮色：.site-backdrop                        （同时兜住无 data-theme 的场景）
+    暗色：html[data-theme=dark] .site-backdrop   （特异性更高，压住亮色那条）
+   底色：html[data-theme=light|dark]{--background:…}
+         （footer.css 的 :root 是 0,1,0，压不住，必须写成 html[data-theme=…]）
+
+  字段语义：
+    enable   总开关；false = 不渲染壁纸图（底色/网格/噪点保留）
+    position 明暗共用，CSS background-position
+    size     明暗共用，CSS background-size
+    scale    明暗共用，放大倍数（盖住 blur 后的边缘毛边）
+    light/dark.image    站内路径或外链 URL；dark 留空则复用 light
+    light/dark.color    页面基础色 --background
+    light/dark.opacity  该层整体透明度
+    light/dark.blur     壁纸模糊半径（px）
+    light/dark.saturate 壁纸饱和度
+============================================================================ */ -}}
+{{- $bg := site.Params.background | default dict -}}
+{{- if $bg -}}
+{{- $light := $bg.light | default dict -}}
+{{- $dark := $bg.dark | default dict -}}
+
+{{- /* 总开关：用 isset 而非 default —— enable = false 不能被当成「未配置」 */ -}}
+{{- $enabled := true -}}
+{{- if isset $bg "enable" }}{{ $enabled = $bg.enable }}{{ end -}}
+
+{{- /* 壁纸：dark.image 留空则复用 light.image；enable = false 时两张都不输出 */ -}}
+{{- $lightImg := $light.image | default "" -}}
+{{- $darkImg := $dark.image | default $lightImg -}}
+{{- if not $enabled }}{{ $lightImg = "" }}{{ $darkImg = "" }}{{ end -}}
+
+{{- /* 明暗共用参数；scale 用 isset 以允许 1 这种「有效但会被 default 吃掉」的值 */ -}}
+{{- $position := $bg.position | default "top center" -}}
+{{- $size := $bg.size | default "cover" -}}
+{{- $scale := 1.035 -}}
+{{- if isset $bg "scale" }}{{ $scale = $bg.scale }}{{ end -}}
+
+{{- /* 底部渐隐遮罩：收到 --background，故改了底色整层自动自洽 */ -}}
+{{- $gradLight := "linear-gradient(to bottom, color-mix(in srgb, var(--background) 20%, transparent) 0%, color-mix(in srgb, var(--background) 60%, transparent) 40%, var(--background) 100%)" -}}
+{{- $gradDark := "linear-gradient(to bottom, color-mix(in srgb, var(--background) 0%, transparent) 0%, color-mix(in srgb, var(--background) 80%, transparent) 60%, var(--background) 100%)" -}}
+
+{{- $modes := slice
+      (dict "theme" "light" "sel" ".site-backdrop" "img" $lightImg "grad" $gradLight "cfg" $light
+            "defColor" "#f2f5ec" "defOpacity" 0.34 "defBlur" 6 "defSaturate" 1.16)
+      (dict "theme" "dark" "sel" "html[data-theme=dark] .site-backdrop" "img" $darkImg "grad" $gradDark "cfg" $dark
+            "defColor" "#10131a" "defOpacity" 0.38 "defBlur" 6 "defSaturate" 1.18) -}}
+
+{{- /* 拼成整段 CSS 再交给 Hugo Pipes 输出成独立样式表，两个原因：
+      ① 不能在 style 标签里直接插值 —— html/template 的 CSS 上下文过滤会把
+         url(...) 和 html[data-theme=dark] 这类选择器替换成 ZgotmplZ；
+      ② 模板语法不进 style 标签，编辑器也就不会把这份文件拿去当 CSS 解析
+         （此前报「应为 @ 规则或选择器」，除了插值本身，注释里出现字面量的
+         style 起始标签也会让 HTML 解析器从这里开始进 CSS 区） */ -}}
+{{- $lines := slice -}}
+{{- range $modes -}}
+{{- $cfg := .cfg -}}
+{{- $color := .defColor }}{{ if isset $cfg "color" }}{{ $color = $cfg.color }}{{ end -}}
+{{- $opacity := .defOpacity }}{{ if isset $cfg "opacity" }}{{ $opacity = $cfg.opacity }}{{ end -}}
+{{- $blur := .defBlur }}{{ if isset $cfg "blur" }}{{ $blur = $cfg.blur }}{{ end -}}
+{{- $saturate := .defSaturate }}{{ if isset $cfg "saturate" }}{{ $saturate = $cfg.saturate }}{{ end -}}
+{{- $layers := slice .grad -}}
+{{- with .img }}{{ $layers = $layers | append (printf "url(%q) %s / %s no-repeat" . $position $size) }}{{ end -}}
+{{- $lines = $lines | append (printf "html[data-theme=%s]{--background:%v}" .theme $color) -}}
+{{- $lines = $lines | append (printf "%s{background:%s;filter:blur(%vpx) saturate(%v);opacity:%v;transform:scale(%v)}" .sel (delimit $layers ", ") $blur $saturate $opacity $scale) -}}
+{{- end -}}
+{{- $res := resources.FromString "css/site-backdrop.css" (delimit $lines "\n") | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ $res.RelPermalink }}">
+{{- end -}}
