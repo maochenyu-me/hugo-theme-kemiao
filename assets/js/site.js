@@ -460,23 +460,42 @@ function initPage(event) {
     onPageReady(import("./outdate-notice.js"), (m) => m.initOutdateNotice(), controller);
   }
 
-  // ---------- 评论（按 provider 加载对应加载器） ----------
-  if (document.getElementById("artalk-comments")) {
-    onPageReady(
-      import("./comment-artalk.js"),
-      (m) => m.initArtalk(signal, {
-        server: document.getElementById("artalk-comments").dataset.server,
-        site: document.getElementById("artalk-comments").dataset.site,
-      }),
-      controller
-    );
-  }
-  if (document.getElementById("twikoo-comments")) {
-    onPageReady(
-      import("./comment-twikoo.js"),
-      (m) => m.initTwikoo({ envId: document.getElementById("twikoo-comments").dataset.envId }),
-      controller
-    );
+  // ---------- 评论：评论区接近视口才初始化（首屏不加载评论厂商资源） ----------
+  const commentSection = document.getElementById("comment-section");
+  if (commentSection) {
+    const startComments = () => {
+      const ecoku = document.getElementById("ecoku-comments");
+      if (ecoku) {
+        const src = ecoku.dataset.ecokuJs;
+        if (src) {
+          const loader = document.createElement("script");
+          loader.src = src;
+          loader.defer = true;
+          document.body.appendChild(loader);
+        }
+        return;
+      }
+      const artalk = document.getElementById("artalk-comments");
+      if (artalk) {
+        onPageReady(
+          import("./comment-artalk.js"),
+          (m) => m.initArtalk(signal, { server: artalk.dataset.server, site: artalk.dataset.site }),
+          controller
+        );
+        return;
+      }
+      const twikoo = document.getElementById("twikoo-comments");
+      if (twikoo) {
+        onPageReady(import("./comment-twikoo.js"), (m) => m.initTwikoo({ envId: twikoo.dataset.envId }), controller);
+      }
+    };
+    const commentObserver = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      commentObserver.disconnect();
+      if (!signal.aborted) startComments();
+    }, { rootMargin: "600px 0px" });
+    commentObserver.observe(commentSection);
+    signal.addEventListener("abort", () => commentObserver.disconnect(), { once: true });
   }
 }
 

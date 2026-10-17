@@ -39,7 +39,8 @@
        ① src 走配置（此前硬编码源站地址，[params.busuanzi].src 从未生效——已修）；
        ② 注入 <script src src> 后，脚本自身会 POST data-api 并填充
           #busuanzi_{site_pv,site_uv,page_pv,page_uv}（默认前缀恰好与主题 DOM 一致）；
-       ③ site:page-load 时重注入脚本以便 pjax/SPA 场景重新计数。 */}}
+       ③ site:page-load 时重注入脚本以便 pjax/SPA 场景重新计数；
+       ④ 首次注入等 window.load 之后，避免异步脚本计入首屏 load 时间（实测 ~5.6s）。 */}}
   {{- if site.Params.busuanzi.enable }}
   <script>
     (function () {
@@ -58,8 +59,10 @@
           refreshTimer = undefined;
         }, 50);
       }
+      // 换页立即刷新；首屏等 load 之后再注入，不让它拖慢首屏 load 指标
       document.addEventListener("site:page-load", refreshBusuanzi);
-      refreshBusuanzi();
+      if (document.readyState === "complete") refreshBusuanzi();
+      else window.addEventListener("load", refreshBusuanzi, { once: true });
     })();
   </script>
   {{- end }}

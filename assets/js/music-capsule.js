@@ -182,10 +182,21 @@ export function initMusicCapsule(s) {
 
   setPlaying(isPlaying());
   applyUserHidden();
-  if (applyUserHidden()) preload();
+
+  // 懒加载：APlayer/Meting 体积不小，且会额外请求歌单与封面，
+  // 改为用户第一次 hover / 聚焦 / 点击胶囊时才加载，首屏不再产生音乐相关请求
+  let armed = false;
+  const arm = () => {
+    if (armed || !applyUserHidden()) return;
+    armed = true;
+    preload();
+  };
+  box.addEventListener("pointerenter", arm, { signal, once: true });
+  box.addEventListener("focusin", arm, { signal, once: true });
 
   toggleBtn.addEventListener("click", (e) => {
     e.stopPropagation();
+    arm();
     toggle();
   }, { signal: signal });
 
@@ -198,7 +209,6 @@ export function initMusicCapsule(s) {
   endHideCheck();
 
   document.addEventListener("site:preferences-change", () => {
-    const enabled = applyUserHidden();
-    if (enabled) preload();
+    applyUserHidden();
   }, { signal: signal });
 }

@@ -206,6 +206,7 @@ function handleAction(parts, actionEl) {
   setPreference(key, enabled);
   // 悠哉文楷：源站由 font-mode 模块监听偏好变更即时生效（正式模块在阶段⑥补齐）
   if (key === "yozaiFont") {
+    if (enabled) window.ensureYozaiCss?.();
     document.firstElementChild?.setAttribute("data-font-mode", enabled ? "yozai" : "system");
   }
   reflectToggles(parts);

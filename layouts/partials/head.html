@@ -6,26 +6,40 @@
 <meta name="theme-color" content="#242424">
 <meta name="copyright" content="Copyright © {{ $site.author }}">
 
-{{- /* 样式：源站编译产物经 Hugo Pipes fingerprint（footer.css 为全站主样式包） */}}
-{{- $main := resources.Get "css/main.css" | minify | fingerprint }}
-{{- $footer := resources.Get "css/footer.css" | minify | fingerprint }}
-{{- $siteCss := resources.Get "css/site.css" }}
-<link rel="stylesheet" href="{{ $footer.RelPermalink }}">
-<link rel="stylesheet" href="{{ $main.RelPermalink }}">
-{{- with $siteCss }}{{- $siteCssMin := . | minify | fingerprint }}<link rel="stylesheet" href="{{ $siteCssMin.RelPermalink }}">{{ end }}
+{{- /* 预连接：字体/图标/音乐 CDN、统计、评论服务，省掉 DNS+TLS 往返 */}}
+<link rel="preconnect" href="https://jsd.liiiu.cn" crossorigin>
+{{- with $site.umami }}{{ if .enable }}{{ $u := urls.Parse .src }}<link rel="preconnect" href="{{ $u.Scheme }}://{{ $u.Host }}">{{ end }}{{ end }}
+{{- with $site.comments }}
+{{- $srv := "" }}
+{{- if eq (.provider | default "artalk") "ecoku" }}{{ $srv = (.ecoku.serverUrl | default "") }}{{ else if eq .provider "twikoo" }}{{ $srv = (.twikoo.envId | default "") }}{{ else }}{{ $srv = (.artalk.server | default "") }}{{ end }}
+{{- with $srv }}{{ $u := urls.Parse . }}{{ if $u.Host }}<link rel="preconnect" href="{{ $u.Scheme }}://{{ $u.Host }}">{{ end }}{{ end }}
+{{- end }}
+
+{{- /* 样式：源站三份产物（footer/main/site）合并成一个包
+      ——合并后少 2 个往返，且 gzip 能吃掉三份之间重复的规则（footer 与 site 有大量同源拷贝）。
+      顺序不能变：footer → main → site，后面覆盖前面。 */}}
+{{- $sheets := slice }}
+{{- with resources.Get "css/footer.css" }}{{ $sheets = $sheets | append . }}{{ end }}
+{{- with resources.Get "css/main.css" }}{{ $sheets = $sheets | append . }}{{ end }}
+{{- with resources.Get "css/site.css" }}{{ $sheets = $sheets | append . }}{{ end }}
+{{- with $sheets }}
+{{- $bundle := . | resources.Concat "css/bundle.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $bundle.RelPermalink }}">
+{{- end }}
 
 {{- /* 页面背景：由 [params.background] 渲染出覆盖样式表，必须排在上面三个样式表之后才压得动 */}}
 {{- partial "background-style.html" . -}}
 
-{{- /* 图标：local 自托管（static/fontawesome/），可切 cdn 回源站同款外链 */}}
+{{- /* 图标：local 自托管（static/fontawesome/），可切 cdn 回源站同款外链
+       all.subset.min.css 由 tools/subset-fa-css.py 生成（只留用到的图标定义，73KB→12KB），
+       新增图标后重跑该脚本（配套 tools/subset-fonts.py 裁字体）。 */}}
 {{- if eq ($site.icons.provider | default "local") "cdn" }}
 <link rel="preconnect" href="https://jsd.liiiu.cn" crossorigin>
 <link rel="stylesheet" href="{{ $site.icons.cdn }}">
 {{- else }}
-<link rel="stylesheet" href="/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="/fontawesome/css/all.subset.min.css">
 {{- end }}
-{{- /* 字体：主字体分片 CSS（悠哉体） */}}
-{{- with $site.fonts.yozaiCss }}<link rel="stylesheet" href="{{ . }}">{{ end }}
+{{- /* 字体：悠哉体 CSS 由 theme-script 按偏好注入（默认系统字体，首访不拉 ~900KB 分片） */}}
 
 {{- /* PWA favicon 套件：由 [params.pwa].enable 总开关控制
        （资产未生成时置 false，只留 /favicon.ico，避免控制台 404 轰炸） */}}
@@ -75,7 +89,23 @@
 {"@context":"https://schema.org","@type":"WebSite","name":{{ site.Title }},"url":{{ site.BaseURL }},"description":{{ $desc }},"author":{"@type":"Person","name":{{ $site.author }},"url":"https://github.com/willow-god"}}
 </script>
 
-{{- /* 统计（默认关闭，配置后启用） */}}
+{{- /* 统计（默认关闭，配置后启用）
+      延迟注入：<script defer> 会阻塞 DOMContentLoaded，而自部署 umami 首字节常在 2~5s，
+      实测把 DCL 从 ~1s 拖到 5.6s。改为 window.load 之后再插入（脚本自带 pushState 监听，换页统计不丢）。 */}}
 {{- with $site.umami }}{{ if .enable }}
-<script defer src="{{ .src }}" data-website-id="{{ .websiteId }}"{{ with .domains }} data-domains="{{ . }}"{{ end }}></script>
+<script>
+  (function () {
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = {{ .src | jsonify | safeJS }};
+    s.setAttribute("data-website-id", {{ .websiteId | jsonify | safeJS }});
+    {{ with .domains }}s.setAttribute("data-domains", {{ . | jsonify | safeJS }});{{ end }}
+    var idle = function (fn) {
+      if (window.requestIdleCallback) window.requestIdleCallback(fn, { timeout: 2000 });
+      else setTimeout(fn, 1);
+    };
+    if (document.readyState === "complete") idle(function () { document.head.appendChild(s); });
+    else window.addEventListener("load", function () { idle(function () { document.head.appendChild(s); }); }, { once: true });
+  })();
+</script>
 {{ end }}{{ end -}}

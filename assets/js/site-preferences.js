@@ -12,7 +12,7 @@ const DEFAULTS = {
   "music-capsule": true,
   "recent-comments": true,
   "context-menu": true,
-  "yozai-font": true,
+  "yozai-font": false,
 };
 
 const BOOL_KEYS = {

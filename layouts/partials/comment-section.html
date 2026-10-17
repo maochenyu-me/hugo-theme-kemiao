@@ -13,6 +13,7 @@
       {{- if and $server $siteId }}
       <section id="ecoku-comments" class="ecoku-shell" data-ecoku-comments
         aria-label="评论区" aria-busy="false"
+        data-ecoku-js="{{ $js }}"
         data-server-url="{{ $server }}"
         data-site-id="{{ $siteId }}"
         data-page-key="{{ .RelPermalink }}"
@@ -27,7 +28,7 @@
         </div>
         <div id="ecoku-mount" data-ecoku-mount></div>
       </section>
-      <script src="{{ $js }}" defer></script>
+      {{- /* 加载器由 site.js 在评论区接近视口时注入，首屏不请求评论资源 */ -}}
       {{- else }}
       <div class="comment-failed">评论服务尚未配置。</div>
       {{- end }}

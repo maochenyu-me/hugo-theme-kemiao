@@ -70,6 +70,7 @@
 {{- $lines = $lines | append (printf "html[data-theme=%s]{--background:%v}" .theme $color) -}}
 {{- $lines = $lines | append (printf "%s{background:%s;filter:blur(%vpx) saturate(%v);opacity:%v;transform:scale(%v)}" .sel (delimit $layers ", ") $blur $saturate $opacity $scale) -}}
 {{- end -}}
-{{- $res := resources.FromString "css/site-backdrop.css" (delimit $lines "\n") | minify | fingerprint -}}
-<link rel="stylesheet" href="{{ $res.RelPermalink }}">
+{{- /* 只有几百字节，直接内联，省掉一个渲染阻塞请求 */ -}}
+{{- $css := resources.FromString "css/site-backdrop.css" (delimit $lines "\n") | minify }}
+<style>{{ $css.Content | safeCSS }}</style>
 {{- end -}}

@@ -1,10 +1,13 @@
-{{/* 防白闪：渲染前设置 data-theme / data-font-mode（与源站逻辑一致） */}}
+{{/* 防白闪：渲染前设置 data-theme / data-font-mode（与源站逻辑一致）。
+     悠哉文楷是分片字体（首访约 900KB），默认不加载；用户在中控台开启时才注入其 CSS。 */}}
+{{- $yozaiCss := (site.Params.fonts | default dict).yozaiCss | default "" -}}
 <script>
   (function () {
     const AUTO = "auto";
     const LIGHT = "light";
     const DARK = "dark";
     const SETTINGS_KEY = "site-settings";
+    const YOZAI_CSS = {{ $yozaiCss }};
 
     function isThemeMode(mode) {
       return [AUTO, LIGHT, DARK].includes(mode);
@@ -39,12 +42,23 @@
 
     function readYozaiFontPreference() {
       const settings = readSettings();
-      return typeof settings["yozai-font"] === "boolean" ? settings["yozai-font"] : true;
+      return typeof settings["yozai-font"] === "boolean" ? settings["yozai-font"] : false;
     }
 
     function applyFontMode(yozaiFont) {
       document.firstElementChild?.setAttribute("data-font-mode", yozaiFont ? "yozai" : "system");
     }
+
+    function ensureYozaiCss() {
+      if (!YOZAI_CSS || document.querySelector('link[data-yozai-css]')) return;
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = YOZAI_CSS;
+      link.setAttribute("data-yozai-css", "");
+      document.documentElement.appendChild(link);
+    }
+
+    window.ensureYozaiCss = ensureYozaiCss;
 
     function resolveTheme(mode) {
       if (mode === LIGHT || mode === DARK) return mode;
@@ -52,7 +66,9 @@
       return hour >= 18 || hour < 8 ? DARK : LIGHT;
     }
 
-    applyFontMode(readYozaiFontPreference());
+    const yozaiEnabled = readYozaiFontPreference();
+    applyFontMode(yozaiEnabled);
+    if (yozaiEnabled) ensureYozaiCss();
 
     const themeMode = readThemeMode();
     const resolvedTheme = resolveTheme(themeMode);
