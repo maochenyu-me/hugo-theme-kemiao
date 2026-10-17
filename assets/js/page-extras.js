@@ -30,7 +30,9 @@ function initCopyRss(signal) {
   }, { signal });
 }
 
-const APPLY_TEMPLATE = [
+// 申请模板优先读页面上的 data-apply-template-source（data/pages/addlink.yaml 渲染），
+// 缺失时退回内置默认
+const APPLY_TEMPLATE_FALLBACK = [
   "name: 站点名称",
   "link: 站点地址",
   "avatar: 头像地址",
@@ -39,13 +41,19 @@ const APPLY_TEMPLATE = [
   "atom: RSS / Atom 订阅地址（可选）",
 ].join("\n");
 
+function getApplyTemplate() {
+  const src = document.querySelector("[data-apply-template-source]");
+  const text = src?.textContent?.trim();
+  return text || APPLY_TEMPLATE_FALLBACK;
+}
+
 function initApplyFill(signal) {
   const btn = document.querySelector("[data-fill-apply-template]");
   if (!btn || btn.dataset.bound) return;
   btn.dataset.bound = "1";
   btn.addEventListener("click", async () => {
     try {
-      await navigator.clipboard.writeText(APPLY_TEMPLATE);
+      await navigator.clipboard.writeText(getApplyTemplate());
       toast("申请模板已复制，粘贴到评论框即可");
     } catch {
       toast("复制失败，请手动复制申请格式");

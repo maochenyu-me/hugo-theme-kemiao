@@ -376,23 +376,6 @@ html.site-lightbox-open { overflow: hidden; }
 .shuoshuo-more-status{margin:0;font-size:.875rem;color:color-mix(in srgb, var(--foreground) 55%, transparent);min-height:1.1rem}
 @media (prefers-reduced-motion:reduce){.shuoshuo-more-button{transition:none}.shuoshuo-more-button:hover:not(:disabled){transform:none}.shuoshuo-more-button[data-state="loading"] .shuoshuo-more-spinner{animation:none}}
 
-/* ===== Ecoku 评论样式适配（kemiao 主题变量映射）===== */
-.ecoku-comments{
-  --ecoku-theme: var(--background,#f7f4ee);
-  --ecoku-entry: var(--card-bg,#fbf9f5);
-  --ecoku-primary: var(--foreground,#1e1c19);
-  --ecoku-secondary: color-mix(in srgb, var(--foreground,#6b655b) 68%, transparent);
-  --ecoku-content: var(--foreground,#35312b);
-  --ecoku-border: var(--border,#cbc3b5);
-  --ecoku-border-soft: color-mix(in srgb, var(--border,#cbc3b5) 22%, transparent);
-  --ecoku-surface-muted: color-mix(in srgb, var(--foreground,#efebe3) 6%, transparent);
-  --ecoku-code-bg: color-mix(in srgb, var(--foreground,#ece7de) 7%, transparent);
-  --ecoku-accent: var(--accent,#c8553a);
-  --ecoku-danger: #dc2626;
-  --ecoku-focus: color-mix(in srgb, var(--accent,#c8553a) 40%, transparent);
-  --ecoku-radius: 8px;
-  --ecoku-radius-sm: 4px;
-}
 /* ===== 标签/分类落地页卡片网格（源站 tags-grid 1:1）===== */
 .tags-grid {
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -495,13 +478,249 @@ html.site-lightbox-open { overflow: hidden; }
   .tags-grid { grid-template-columns: 1fr; }
 }
 
-/* ------------------------------------------------------------------
-   顶栏装饰线不吃鼠标事件
-   1px 的 #header-border 铺满整行且压在导航下拉（z-index:80）之上，
-   鼠标从触发按钮下移切入子菜单、经过 y≈87 时 hover 被它截断，
-   pointer-events 立即变 none 导致子菜单被收回（源站那条线在下拉之下，无此问题）。
-   纯装饰元素，直接放行命中测试。
-   ------------------------------------------------------------------ */
 #header-border {
   pointer-events: none;
 }
+
+/* ------------------------------------------------------------------
+   Ecoku 评论样式：把 Ecoku 的观感对齐到主题里的 Artalk。
+   做法（对应 ecoku custom-css 文档「默认样式 + 变量」方式）：
+   Ecoku 全部默认值都声明在 :where() 里（零优先级），所以这里用
+   .comment-section #ecoku-comments 作用域的普通规则即可整体覆盖，
+   不需要 !important，也不受样式表顺序影响。颜色一律映射主题变量
+   （--foreground / --background / --border / --accent），明暗随主题切换。
+   ------------------------------------------------------------------ */
+.comment-section #ecoku-comments .ecoku-comments {
+  /* 变量层：与 site.css 里 .comment-section #artalk-comments.artalk 的 --at-* 映射一致 */
+  --ecoku-theme: var(--background);
+  --ecoku-entry: color-mix(in srgb, var(--foreground) 3%, var(--background));
+  --ecoku-primary: var(--foreground);
+  --ecoku-secondary: color-mix(in srgb, var(--foreground) 52%, transparent);
+  --ecoku-content: var(--foreground);
+  --ecoku-border: color-mix(in srgb, var(--border) 30%, transparent);
+  --ecoku-border-soft: color-mix(in srgb, var(--border) 18%, transparent);
+  --ecoku-surface-muted: color-mix(in srgb, var(--foreground) 5%, var(--background));
+  --ecoku-accent: var(--accent);
+  --ecoku-danger: #d05d68;
+  --ecoku-focus: color-mix(in srgb, var(--accent) 40%, transparent);
+  --ecoku-shadow: 0 8px 24px -12px color-mix(in srgb, var(--foreground) 30%, transparent);
+  --ecoku-radius: 6px;
+  --ecoku-radius-sm: 3px;
+  --ecoku-font-mono: inherit;
+  --ecoku-font-size: 15px;
+  --ecoku-font-size-small: 13px;
+  --ecoku-font-size-title: 22px;
+  max-width: none;
+}
+
+/* ---------- 发表卡片：对齐 .atk-main-editor ---------- */
+.comment-section #ecoku-comments .ecoku-composer {
+  padding: 10px 18px 14px;
+  background: color-mix(in srgb, var(--foreground) 3%, var(--background));
+  border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+  border-radius: 6px;
+}
+
+.comment-section #ecoku-comments .ecoku-composer:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* Artalk 的身份输入没有下划线，聚焦提示走 label 变色 */
+.comment-section #ecoku-comments .ecoku-field {
+  border-bottom: 0;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.comment-section #ecoku-comments .ecoku-field:focus-within {
+  border-bottom: 0;
+}
+
+.comment-section #ecoku-comments .ecoku-field:focus-within .ecoku-field-label {
+  color: var(--accent);
+}
+
+.comment-section #ecoku-comments .ecoku-field-label {
+  color: color-mix(in srgb, var(--foreground) 40%, transparent);
+  font-size: 12px;
+}
+
+.comment-section #ecoku-comments .ecoku-input {
+  height: 36px;
+  font-size: 14px;
+}
+
+.comment-section #ecoku-comments .ecoku-textarea {
+  min-height: 120px;
+  padding: 8px 0 4px;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.comment-section #ecoku-comments .ecoku-textarea::placeholder {
+  color: color-mix(in srgb, var(--foreground) 40%, transparent);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+/* ---------- 按钮：发布 = Artalk 的软色强调按钮；预览/表情 = 文字按钮 ---------- */
+.comment-section #ecoku-comments .ecoku-primary-button {
+  height: 2.35rem;
+  min-height: 2.35rem;
+  min-width: 5.8rem;
+  padding: 0 1rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--accent) 13%, var(--background));
+  color: color-mix(in srgb, var(--accent) 88%, var(--foreground));
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  box-shadow: inset 0 1px 0 #ffffff38, 0 12px 24px -20px color-mix(in srgb, var(--accent) 40%, transparent);
+  transition: transform 0.18s, border-color 0.18s, background-color 0.18s, color 0.18s;
+}
+
+.comment-section #ecoku-comments .ecoku-primary-button:not(:disabled):hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent) 20%, var(--background));
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.comment-section #ecoku-comments .ecoku-secondary-button,
+.comment-section #ecoku-comments .ecoku-smoji-trigger {
+  height: 30px;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 3px;
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.comment-section #ecoku-comments .ecoku-composer-end .ecoku-secondary-button,
+.comment-section #ecoku-comments .ecoku-smoji-trigger {
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+
+.comment-section #ecoku-comments .ecoku-secondary-button:not(:disabled):hover,
+.comment-section #ecoku-comments .ecoku-smoji-trigger:not(:disabled):hover,
+.comment-section #ecoku-comments .ecoku-smoji-trigger[aria-expanded="true"],
+.comment-section #ecoku-comments .ecoku-preview-trigger[aria-pressed="true"] {
+  color: var(--accent);
+}
+
+.comment-section #ecoku-comments .ecoku-secondary-button:not(:disabled):hover {
+  border-color: transparent;
+}
+
+/* ---------- 面板：表情面板 / 排序菜单 / 错误卡，对齐 .atk-dropdown 的卡片观感 ---------- */
+.comment-section #ecoku-comments .ecoku-sort-menu,
+.comment-section #ecoku-comments .ecoku-smoji-panel,
+.comment-section #ecoku-comments .ecoku-service-error {
+  background: color-mix(in srgb, var(--foreground) 3%, var(--background));
+  border-color: color-mix(in srgb, var(--border) 30%, transparent);
+}
+
+/* ---------- 列表头 ---------- */
+.comment-section #ecoku-comments .ecoku-section-heading {
+  margin: 28px 0 8px;
+}
+
+/* ---------- 评论条目：昵称蓝（--at-color-main 语义）、时间灰、动作钮无下划线 ---------- */
+.comment-section #ecoku-comments .ecoku-comment-author {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.comment-section #ecoku-comments a.ecoku-comment-author:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.28em;
+}
+
+.comment-section #ecoku-comments .ecoku-blogger-badge {
+  padding: 0 6px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--accent) 13%, var(--background));
+  color: var(--accent);
+  line-height: 17px;
+}
+
+.comment-section #ecoku-comments .ecoku-comment-time,
+.comment-section #ecoku-comments .ecoku-collapse-button {
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.comment-section #ecoku-comments .ecoku-comment-time:hover,
+.comment-section #ecoku-comments .ecoku-collapse-button:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.comment-section #ecoku-comments .ecoku-comment-meta .ecoku-reply-action {
+  color: color-mix(in srgb, var(--foreground) 52%, transparent);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.comment-section #ecoku-comments .ecoku-comment-meta .ecoku-reply-action:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+/* Artalk 的评论间没有分隔线，只靠留白；引导线保留 */
+.comment-section #ecoku-comments .ecoku-thread-list,
+.comment-section #ecoku-comments .ecoku-thread-list > .ecoku-comment-node {
+  border-color: transparent;
+}
+
+/* ---------- 分页：对齐 .atk-pagination 的按钮形态 ---------- */
+.comment-section #ecoku-comments .ecoku-pagination {
+  gap: 10px;
+}
+
+.comment-section #ecoku-comments .ecoku-pagination-separator {
+  display: none;
+}
+
+.comment-section #ecoku-comments .ecoku-pager-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  min-height: 30px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--foreground) 3%, var(--background));
+  color: var(--foreground);
+  font-size: 13px;
+  letter-spacing: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.comment-section #ecoku-comments .ecoku-pager-button:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 7%, var(--background));
+  color: var(--foreground);
+}
+
+.comment-section #ecoku-comments .ecoku-pager-button:disabled {
+  opacity: 0.4;
+}
+
+.comment-section #ecoku-comments .ecoku-pagination-status {
+  color: var(--foreground);
+  font-size: 13px;
+}
+
+/* 支持页：加入赞助名单的邮箱说明卡（文案在 content/rewards.md 的 backersNote） */
+.backers-note{margin-bottom:2.5rem;padding:1rem 1.25rem;border:1px solid color-mix(in srgb, var(--accent) 22%, transparent);border-radius:.75rem;background:color-mix(in srgb, var(--accent) 7%, var(--background))}
+.backers-note-head{align-items:center;gap:.6rem;display:flex;color:var(--foreground);font-size:.9375rem}
+.backers-note-icon{color:var(--accent);background:color-mix(in srgb, var(--accent) 14%, transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);border-radius:.55rem;width:1.9rem;height:1.9rem;justify-content:center;align-items:center;display:inline-flex;font-size:.8125rem}
+.backers-note-text{color:color-mix(in srgb, var(--foreground) 70%, transparent);margin:.5rem 0 0;font-size:.875rem;line-height:1.7}
+.backers-note-fields{flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:.65rem;display:flex}
+.backers-note-mail{align-items:center;gap:.45rem;color:color-mix(in srgb, var(--accent) 88%, var(--foreground));background:linear-gradient(180deg, color-mix(in srgb, var(--accent) 17%, var(--background)), color-mix(in srgb, var(--accent) 9%, var(--background)));border:1px solid color-mix(in srgb, var(--accent) 32%, transparent);border-radius:.65rem;padding:.45rem .9rem;font-weight:600;font-size:.875rem;letter-spacing:.01em;text-decoration:none;display:inline-flex;box-shadow:inset 0 1px 0 #ffffff30, 0 10px 22px -16px color-mix(in srgb, var(--accent) 50%, transparent);transition:transform .18s,border-color .18s,background-color .18s,box-shadow .18s,color .18s}
+.backers-note-mail i{font-size:.8125rem;text-shadow:0 0 12px color-mix(in srgb, var(--accent) 45%, transparent)}
+.backers-note-mail:hover{color:var(--accent);background:linear-gradient(180deg, color-mix(in srgb, var(--accent) 26%, var(--background)), color-mix(in srgb, var(--accent) 14%, var(--background)));border-color:color-mix(in srgb, var(--accent) 55%, transparent);transform:translateY(-1px);box-shadow:inset 0 1px 0 #ffffff38, 0 12px 26px -14px color-mix(in srgb, var(--accent) 60%, transparent), 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent)}
+.backers-note-field{color:var(--foreground);background:color-mix(in srgb, var(--foreground) 5%, var(--background));border-radius:.5rem;padding:.25rem .6rem;font-size:.8125rem}
+@media (prefers-reduced-motion:reduce){.backers-note-mail{transition:none}}

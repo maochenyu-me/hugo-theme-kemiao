@@ -1,7 +1,36 @@
-{{- /* 留言板：Hero + 规范正文 + 评论区 */}}
+{{- /* 留言板：Hero + 介绍/规范 + 评论区
+     文案在 data/pages/comment.yaml；data 缺失时回退渲染 md 正文。 */}}
 {{- define "main" }}
 {{- partial "breadcrumb.html" (dict "label" "Comment") }}
 {{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
+{{- $d := site.Data.pages.comment }}
+{{- if $d }}
+<section class="comment-intro app-card">
+  <div>
+    <div class="comment-kicker">{{ $d.intro.kicker }}</div>
+    <h2>{{ $d.intro.title }}</h2>
+    {{- range $d.intro.paragraphs }}<p>{{ . }}</p>{{ end }}
+  </div>
+  <div class="comment-quote" aria-label="留言板寄语"><span>{{ $d.intro.quote }}</span></div>
+</section>
+<section class="comment-notice">
+  <div class="notice-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></div>
+  <details class="notice-details">
+    <summary class="notice-summary">{{ $d.notice.summary }}</summary>
+    <div class="notice-content">
+      <ol>
+        {{- range $d.notice.rules }}
+        <li><strong>{{ .title }}</strong><span>{{ .text }}</span></li>
+        {{- end }}
+      </ol>
+      <div class="notice-warn">
+        {{- range $d.notice.warn }}<p>{{ . }}</p>{{ end }}
+      </div>
+    </div>
+  </details>
+</section>
+{{- else }}
 {{- with .Content }}{{ . }}{{ end }}
+{{- end }}
 {{- partial "comment-section.html" . }}
 {{- end }}

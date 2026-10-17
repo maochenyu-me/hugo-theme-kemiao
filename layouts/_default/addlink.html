@@ -1,6 +1,72 @@
-{{- /* 友链申请：Hero + 申请卡片正文 + 评论区（含一键填充按钮） */}}
+{{- /* 友链申请：Hero + 申请卡片正文 + 评论区（含一键填充按钮）
+     文案在 data/pages/addlink.yaml；「本站信息」模板由站点参数自动生成。
+     data 缺失时回退渲染 md 正文（向后兼容）。 */}}
 {{- define "main" }}
 {{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
+{{- $d := site.Data.pages.addlink }}
+{{- if $d }}
+<div class="apply-grid">
+  {{- /* 申请流程 */}}
+  <section class="apply-card app-card apply-card-wide">
+    <div class="apply-card-kicker">{{ $d.flow.kicker }}</div>
+    <h2 class="apply-card-title">{{ $d.flow.title }}</h2>
+    <ol class="apply-steps mt-4">
+      {{- range $i, $step := $d.flow.steps }}
+      <li><span class="step-index">{{ printf "%02d" (add $i 1) }}</span><span>{{ $step }}</span></li>
+      {{- end }}
+    </ol>
+  </section>
+  {{- /* 友链要求 */}}
+  <section class="apply-card app-card apply-card-wide" id="{{ $d.requirements.id }}">
+    <div class="apply-card-kicker">{{ $d.requirements.kicker }}</div>
+    <h2 class="apply-card-title">{{ $d.requirements.title }}</h2>
+    <div class="requirements-grid">
+      {{- range $d.requirements.items }}
+      <div class="requirement-item"><span class="requirement-title">{{ .title }}</span><span class="requirement-content">{{ .content | safeHTML }}</span></div>
+      {{- end }}
+    </div>
+  </section>
+  {{- /* 域名说明 */}}
+  <section class="apply-card app-card apply-card-wide">
+    <div class="apply-card-kicker">{{ $d.domains.kicker }}</div>
+    <h2 class="apply-card-title">{{ $d.domains.title }}</h2>
+    <div class="domain-grid">
+      {{- range $d.domains.items }}
+      <div class="domain-item domain-{{ .level }}"><span class="domain-label">{{ .label }}</span><span class="domain-content">{{ .content | safeHTML }}</span></div>
+      {{- end }}
+    </div>
+  </section>
+  {{- /* 本站信息：由站点参数生成，单一事实来源 */}}
+  {{- $base := strings.TrimSuffix "/" site.BaseURL }}
+  <section class="apply-card app-card">
+    <div class="apply-card-kicker">{{ $d.mysite.kicker }}</div>
+    <h2 class="apply-card-title">{{ $d.mysite.title }}</h2>
+    <p class="apply-copy">{{ $d.mysite.copy }}</p>
+    <div class="template-box mt-3">
+      <pre class="site-template-pre">name: {{ site.Title }}
+link: {{ $base }}/
+avatar: {{ site.Params.avatar }}
+descr: {{ site.Params.description }}
+{{- with site.Params.siteshot }}
+siteshot: {{ . }}
+{{- end }}
+atom: {{ $base }}/atom.xml
+linkpage: {{ $base }}/link/</pre>
+    </div>
+    <p class="apply-note mt-3">{{ $d.mysite.note | markdownify }}</p>
+  </section>
+  {{- /* 申请格式 */}}
+  <section class="apply-card app-card" id="apply-format">
+    <div class="apply-card-kicker">{{ $d.format.kicker }}</div>
+    <h2 class="apply-card-title">{{ $d.format.title }}</h2>
+    <p class="apply-copy">{{ $d.format.copy }}</p>
+    <div class="template-box mt-3" data-apply-template-source>{{ range $d.format.fields }}{{ range $k, $v := . }}<div>{{ $k }}: {{ $v }}</div>{{ "\n" }}{{ end }}{{ end }}</div>
+    <button type="button" class="apply-action mt-3" data-fill-apply-template><i class="fa-solid fa-wand-magic-sparkles text-xs leading-none" aria-hidden="true"></i>{{ $d.format.button }}</button>
+    {{- range $i, $note := $d.format.notes }}<p class="apply-copy{{ if eq $i 0 }} mt-4{{ end }}">{{ $note }}</p>{{ end }}
+  </section>
+</div>
+{{- else }}
 {{- with .Content }}{{ . }}{{ end }}
+{{- end }}
 {{- partial "comment-section.html" . }}
 {{- end }}

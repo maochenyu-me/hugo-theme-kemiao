@@ -1,5 +1,50 @@
-{{- /* 订阅页：Hero + 订阅卡片正文（复制按钮由 subscribe.js 处理） */}}
+{{- /* 订阅页：Hero + 订阅卡片正文（复制按钮由 page-extras.js 处理）
+     文案在 data/pages/subscribe.yaml；RSS 地址由 baseURL 自动生成，
+     不再写死源站域名。data 缺失时回退渲染 md 正文。 */}}
 {{- define "main" }}
 {{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
+{{- $d := site.Data.pages.subscribe }}
+{{- $base := strings.TrimSuffix "/" site.BaseURL }}
+{{- $rss := printf "%s/atom.xml" $base }}
+{{- if $d }}
+<div class="subscribe-grid">
+  {{- range $d.cards }}
+  <a class="subscribe-card app-card" href="{{ if .external }}{{ .href }}{{ else if eq .href "atom" }}{{ $rss }}{{ else }}{{ .href | relURL }}{{ end }}"{{ if .external }} target="_blank" rel="noopener noreferrer"{{ end }}>
+    <span class="subscribe-card-icon" aria-hidden="true"><i class="{{ .icon }}"></i></span>
+    <span class="subscribe-card-title">{{ .title }}</span>
+    <span class="subscribe-card-desc">{{ .desc }}</span>
+    <span class="subscribe-card-action">{{ .action }}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+  </a>
+  {{- end }}
+</div>
+<section class="subscribe-section app-card">
+  <div class="subscribe-section-head">
+    <div><div class="subscribe-kicker">{{ $d.rss.kicker }}</div><h2>{{ $d.rss.title }}</h2></div>
+    <i class="{{ $d.rss.icon }}" aria-hidden="true"></i>
+  </div>
+  <p>{{ $d.rss.desc }}</p>
+  <div class="subscribe-copy-box"><code id="rss-url">{{ $rss }}</code><button type="button" data-copy-rss><i class="fa-regular fa-copy" aria-hidden="true"></i>复制</button></div>
+  <div class="subscribe-tools" aria-label="{{ $d.rss.toolsLabel }}">
+    {{- range $d.rss.tools }}<a href="{{ .href }}" target="_blank" rel="noopener noreferrer">{{ .label }}</a>{{ end }}
+  </div>
+</section>
+<section class="subscribe-section app-card">
+  <div class="subscribe-section-head">
+    <div><div class="subscribe-kicker">{{ $d.mail.kicker }}</div><h2>{{ $d.mail.title }}</h2></div>
+    <i class="{{ $d.mail.icon }}" aria-hidden="true"></i>
+  </div>
+  <p>{{ replace $d.mail.desc "{link}" (printf `<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>` $d.mail.link.href $d.mail.link.label) | safeHTML }}</p>
+  <ol class="subscribe-steps">
+    {{- range $i, $step := $d.mail.steps }}
+    <li><span>{{ printf "%02d" (add $i 1) }}</span>
+      {{- if .href }}<a href="{{ .href }}" target="_blank" rel="noopener noreferrer">{{ .text }}</a>
+      {{- else }}<p>{{ .text }}</p>{{ end }}
+    </li>
+    {{- end }}
+  </ol>
+</section>
+<p class="subscribe-footer">{{ $d.footer }}</p>
+{{- else }}
 {{- with .Content }}{{ . }}{{ end }}
+{{- end }}
 {{- end }}

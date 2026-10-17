@@ -327,11 +327,13 @@ node tools/build.mjs --no-pf  # 跳过 pagefind 索引
 | `artalk.server` / `artalk.site` | Artalk 服务端与站点名 |
 | `twikoo.envId` | Twikoo 环境 ID |
 | `ecoku.serverUrl` / `siteId` / `pageSize` / `theme` / `i18n` | Ecoku 自托管参数 |
-| `ecoku.jsUrl` / `cssUrl` | 可选，自定义加载器与样式 |
+| `ecoku.jsUrl` / `cssUrl` | 可选，自定义加载器与样式（主题已内置观感适配，一般不用配） |
 | `recentComments.authorFilter` | 站主昵称过滤，命中不计入「最近评论」，逗号分隔 |
 
 > 最近评论（浮动面板 + 中控台区块）依赖 artalk/twikoo 的公开接口；`provider = ecoku` 时主题会自动关闭该功能（模板层门控，不会渲染空面板）。
 > 评论区在接近视口时才初始化（`IntersectionObserver`，rootMargin 600px），所以首屏不产生评论请求。
+>
+> **Ecoku 观感适配**：主题已通过 ecoku 的「默认样式 + 变量」机制（见 [custom-css 文档](https://ecoku.zsh.moe/integration/custom-css)）把评论区的配色、字号、按钮、分页对齐到 Artalk 的观感，样式在 `assets/css/site.css` 的「Ecoku 评论样式」段——颜色全部映射 `--foreground` / `--background` / `--border` / `--accent`，明暗随主题切换。改 Ecoku 样式改那里，不要动 `data-css-url`。
 
 ### 文章 `[params.article]`
 
@@ -460,6 +462,16 @@ node tools/build.mjs --no-pf  # 跳过 pagefind 索引
 | `tg.baseUrl` / `tg.channelId` / `tg.pageSize` / `tg.detailLink` | koharu-suite（tg） |
 
 `tg` 模式接口契约：`GET {baseUrl}/api/v1/messages/latest?channel=<uuid>&limit=N&cursor=<nextCursor>`，返回 `{ items, nextCursor }`。
+
+> **本地说说数据的开关**：`content/shuoshuo/_index.md` 里有一个 `cascade.build`（list/render = never）。`source` 用 `tg` / `api` 时保留它——本地说说 md 不构建单页、不进任何列表（含标签/分类），`/shuoshuo/<slug>/` 直接 404；切回 `source = 'local'` 时删除该段即可恢复。标签/分类页在模板层已按 `Type = posts` 过滤，说说永远不会混进去。
+
+### 独立页面文案：`data/pages/*.yaml`
+
+友链申请（addlink）、订阅（subscribe）、留言板（comment）这类「结构化 UI 页」的文案不在 md 里，在 `data/pages/<页面名>.yaml`，由对应模板（`layouts/_default/<page>.html`）渲染，**改文案改 YAML，不动模板**：
+
+- 站点相关信息（站名、域名、头像、RSS 地址、友链申请的「本站信息」模板）**不放在文案文件里**，模板直接读 `hugo.toml` 的参数（`title` / `baseURL` / `avatar` / `description` / `siteshot`），一处配置全站生效。
+- `content/<page>.md` 只保留 front matter（title / description / hero），正文留空；删掉对应 data 文件时模板会回退渲染 md 正文（向后兼容）。
+- 新增同类型页面照抄这个模式：文案进 `data/pages/`，结构进模板，样式进 `site.css`。
 
 ### 友链朋友圈 `[params.fcircle]`
 

@@ -10,7 +10,8 @@
   <p class="mt-2 mb-6 italic">All the articles with the tag &ldquo;{{ .Title }}&rdquo;.</p>
   {{- end }}
   <ul>
-    {{- range .Pages.ByDate.Reverse }}
+    {{- /* 只列文章：说说与独立页面不进标签/分类页（口径与首页/归档一致） */}}
+    {{- range (where .Pages "Type" "posts").ByDate.Reverse }}
     {{- partial "post-row-card.html" . }}
     {{- end }}
   </ul>
@@ -29,25 +30,34 @@
 {{- if eq $label "分类" }}{{ $unit = "个分类" }}{{ end }}
 {{- /* 文章数只统计 posts（与首页/归档/网站信息卡一致；site.RegularPages 会把说说和独立页面也算进来） */}}
 {{- $postCount := len (where site.RegularPages "Type" "posts") }}
+{{- /* 标签卡只统计文章：过滤掉说说/独立页面贡献的标签与计数 */}}
+{{- $cards := slice }}
+{{- range .Data.Terms.ByCount }}
+  {{- $posts := where .Page.Pages "Type" "posts" }}
+  {{- if gt (len $posts) 0 }}
+    {{- $cards = $cards | append (dict "page" .Page "count" (len $posts)) }}
+  {{- end }}
+{{- end }}
 {{- partial "page-hero.html" (dict
     "title" $label
     "desc" $desc
     "badges" (slice
-      (dict "text" (printf "%d %s" (len .Data.Terms) $unit))
+      (dict "text" (printf "%d %s" (len $cards) $unit))
       (dict "text" (printf "%d 篇文章" $postCount)))
     "gradient" false) }}
+{{- /* 标签卡只统计文章：过滤掉说说/独立页面贡献的标签与计数 */}}
 <div class="tags-grid">
-  {{- range .Data.Terms.ByCount }}
-  <a href="{{ .Page.RelPermalink }}" class="tag-card group" data-aurora-card>
+  {{- range sort $cards "count" "desc" }}
+  <a href="{{ .page.RelPermalink }}" class="tag-card group" data-aurora-card>
     <div class="card-aurora" data-card-aurora></div>
     <div class="card-border-glow" data-card-border></div>
     <div class="tag-content">
       <div class="flex items-center gap-1.5">
         <i class="fa-solid fa-hashtag text-xl leading-none text-accent opacity-60 transition-opacity group-hover:opacity-100" aria-hidden="true"></i>
-        <span class="tag-name">{{ .Page.Title }}</span>
+        <span class="tag-name">{{ .page.Title }}</span>
       </div>
       <div class="tag-count">
-        <span class="tag-count-number">{{ .Count }}</span>
+        <span class="tag-count-number">{{ .count }}</span>
         <span class="tag-count-label">篇</span>
       </div>
     </div>

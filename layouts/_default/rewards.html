@@ -17,6 +17,24 @@
   {{- end }}
 </section>
 {{- end }}
+{{- /* 加入赞助名单的说明卡：邮箱走 mailto 高亮链接，文案在 content/rewards.md 的 backersNote */}}
+{{- with $p.backersNote }}
+{{- $note := . }}
+{{- with $note.email }}
+<section class="backers-note">
+  <div class="backers-note-head">
+    <span class="backers-note-icon" aria-hidden="true"><i class="fa-solid fa-envelope"></i></span>
+    <strong>{{ $note.title | default "想加入赞助名单？" }}</strong>
+  </div>
+  <p class="backers-note-text">{{ $note.lead }}</p>
+  <div class="backers-note-fields">
+    <a class="backers-note-mail" href="mailto:{{ $note.email }}"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i>{{ $note.email }}</a>
+    {{- range $note.fields }}<span class="backers-note-field">{{ . }}</span>{{ end }}
+  </div>
+  {{- with $note.suffix }}<p class="backers-note-text">{{ . }}</p>{{ end }}
+</section>
+{{- end }}
+{{- end }}
 {{- $backers := hugo.Data.backers }}
 <section class="backers-section">
   <p class="backers-quote">{{ $p.backersQuote }}</p>
