@@ -27,12 +27,14 @@
 {{- end }}
 {{- $unit := "个标签" }}
 {{- if eq $label "分类" }}{{ $unit = "个分类" }}{{ end }}
+{{- /* 文章数只统计 posts（与首页/归档/网站信息卡一致；site.RegularPages 会把说说和独立页面也算进来） */}}
+{{- $postCount := len (where site.RegularPages "Type" "posts") }}
 {{- partial "page-hero.html" (dict
     "title" $label
     "desc" $desc
     "badges" (slice
       (dict "text" (printf "%d %s" (len .Data.Terms) $unit))
-      (dict "text" (printf "%d 篇文章" (len site.RegularPages))))
+      (dict "text" (printf "%d 篇文章" $postCount)))
     "gradient" false) }}
 <div class="tags-grid">
   {{- range .Data.Terms.ByCount }}

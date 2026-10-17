@@ -1,5 +1,7 @@
 // 说说页（本地数据源）：服务端已渲染卡片，这里只负责瀑布流、入场 reveal、灯箱、回复引用
 // 列表页（#shuoshuo-feed）与详情页（.shuoshuo-feed 单卡）共用
+import { openAnchorLightbox } from "./lightbox.js";
+
 const FEED = document.querySelector(".shuoshuo-feed");
 
 function el(tag, cls) {
@@ -52,27 +54,17 @@ function watchMasonry(list, signal) {
   );
 }
 
-// 简易灯箱（与 shuoshuo-page.js 同款，对应源站 Fancybox 图片预览）
+// 灯箱：统一走全局 lightbox 模块（分组翻页，对应源站 Fancybox 图片预览）
 function initLightbox(root, signal) {
-  const overlays = Array.from(root.querySelectorAll("[data-shuoshuo-fancybox='true']"));
-  if (!overlays.length) return;
-  const overlay = el("div", "shuoshuo-lightbox");
-  overlay.hidden = true;
-  const img = el("img");
-  overlay.append(img);
-  overlay.addEventListener("click", () => {
-    overlay.classList.remove("is-open");
-    setTimeout(() => (overlay.hidden = true), 200);
-  }, { signal });
-  document.body.append(overlay);
-  overlays.forEach((a) =>
+  root.querySelectorAll("[data-shuoshuo-fancybox='true']").forEach((a) => {
+    if (a.dataset.siteLightbox === "true") return;
+    a.dataset.siteLightbox = "true";
+    a.style.cursor = "zoom-in";
     a.addEventListener("click", (e) => {
       e.preventDefault();
-      img.src = a.href;
-      overlay.hidden = false;
-      requestAnimationFrame(() => overlay.classList.add("is-open"));
-    }, { signal })
-  );
+      openAnchorLightbox(a);
+    }, { signal });
+  });
 }
 
 // 引用说说到评论框（逐行加引用前缀；原帖入口已有「查看详情」按钮，不再塞链接）

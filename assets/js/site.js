@@ -217,7 +217,7 @@ function initMobileMenu(signal) {
   document.addEventListener("keydown", (e) => { e.key === "Escape" && setMobileMenu(false); }, { signal });
 }
 
-// ---------- 移动端目录抽屉（源站 header.js A/j/M/E 1:1） ----------
+// ---------- 移动端目录抽屉（源站 header.js A/j/M/E 1:1；文档级委托，切页不重绑） ----------
 function getMobileToc() {
   const trigger = document.querySelector("[data-mobile-toc-trigger]");
   const drawer = document.querySelector("[data-mobile-toc-drawer]");
@@ -233,8 +233,6 @@ function setMobileToc(open) {
   drawer.setAttribute("aria-hidden", open ? "false" : "true");
 }
 function initMobileToc(signal) {
-  const parts = getMobileToc();
-  if (!parts) return;
   setMobileToc(false);
   document.addEventListener("click", (e) => {
     const t = e.target;
@@ -246,7 +244,7 @@ function initMobileToc(signal) {
     }
     if (t.closest("[data-mobile-toc-close]")) setMobileToc(false);
   }, { signal });
-  parts.drawer.addEventListener("toc:navigate", () => setMobileToc(false), { signal });
+  document.addEventListener("toc:navigate", () => setMobileToc(false), { signal });
   document.addEventListener("keydown", (e) => { e.key === "Escape" && setMobileToc(false); }, { signal });
 }
 
@@ -315,96 +313,173 @@ function initScrollProgress(signal) {
   update();
 }
 
-const controller = new AbortController();
-initHeaderScroll(controller.signal);
-initScrollTopButton(controller.signal);
-initMobileMenu(controller.signal);
-initMobileToc(controller.signal);
-initDropdowns(controller.signal);
-initGlidePills(controller.signal);
-initScrollProgress(controller.signal);
-initCursorGlow();
+// ============================================================
+// 初始化管线（swup 架构）：
+// - 全局一次：文档级委托 / swup 容器外的元素（snackbar、主题、搜索弹窗、
+//   右键菜单、滚动进度条、音乐胶囊等，切页不重绑、播放不中断）
+// - 每页重挂：swup 容器内的元素（header、药丸、文章页、评论等），
+//   由 site:page-load 事件驱动，上一页监听随 AbortController 一并作废
+// ============================================================
 
-// ---------- 站内通知条（阶段⑤，全局） ----------
+const globalController = new AbortController();
+const globalSignal = globalController.signal;
+
+initScrollProgress(globalSignal);
+initCursorGlow();
+initMobileMenu(globalSignal);
+initMobileToc(globalSignal);
+
+// ---------- 站内通知条（全局） ----------
 import("./snackbar.js");
 
-// ---------- 主题模块（阶段⑤）：补齐 toggle/reflect/fade/auto ----------
+// ---------- 主题模块（全局） ----------
 import("./theme.js");
 
-// ---------- 中控台（阶段⑤） ----------
-if (document.querySelector("[data-control-console-trigger]")) {
-  import("./control-console.js").then((m) => m.initControlConsole(controller.signal));
-}
-
-// ---------- 右键菜单（阶段⑤） ----------
+// ---------- 右键菜单（容器外，全局一次） ----------
 if (document.getElementById("site-context-menu-root")) {
-  import("./context-menu.js").then((m) => m.initContextMenu(controller.signal));
+  import("./context-menu.js").then((m) => m.initContextMenu(globalSignal));
 }
 
-// ---------- 搜索弹窗（阶段⑤） ----------
+// ---------- 搜索弹窗（容器外，全局一次） ----------
 if (document.getElementById("search-modal")) {
   import("./search-modal.js").then((m) => m.initSearchModal());
 }
 
-// ---------- 首页行为（阶段②）----------
-if (document.getElementById("bber-talk") || document.querySelector("[data-patron-card]")) {
-  import("./home.js").then((m) => m.initHome(controller.signal));
-}
-
-// ---------- Aurora 光效（阶段④，全站）----------
-import("./aurora.js").then((m) => m.initAuroraEffects(controller.signal));
-
-// ---------- 页面级行为（阶段④）----------
-if (document.querySelector("[data-fc-root]")) {
-  import("./fcircle.js").then((m) => m.initFcircle());
-}
-const shuoshuoFeed = document.getElementById("shuoshuo-feed");
-if (shuoshuoFeed && shuoshuoFeed.dataset.source === "local") {
-  import("./shuoshuo-local.js").then((m) => m.initShuoshuoPage(controller.signal));
-} else if (shuoshuoFeed && shuoshuoFeed.dataset.source === "tg") {
-  import("./shuoshuo-tg.js").then((m) => m.initShuoshuoPage(controller.signal));
-} else if (shuoshuoFeed) {
-  import("./shuoshuo-page.js").then((m) => m.initShuoshuoPage(controller.signal));
-}
-if (document.querySelector(".friend-card[data-href]")) {
-  import("./friend-status.js").then((m) => m.initLinkPage(controller.signal));
-}
-if (document.querySelector("[data-copy-rss]") || document.querySelector("[data-fill-apply-template]") || document.querySelector(".patron-qr-image")) {
-  import("./page-extras.js").then((m) => m.initPageExtras(controller.signal));
-}
-
-// ---------- 独立搜索页（查漏补缺） ----------
-if (document.getElementById("algolia-search")) {
-  import("./search-page.js").then((m) => m.initSearchPage(controller.signal));
-}
-
-// ---------- 安全跳转页（查漏补缺） ----------
-if (document.querySelector("[data-safego]")) {
-  import("./safego.js").then((m) => m.initSafego());
-}
-
-// ---------- 文章过期提示（查漏补缺） ----------
-if (document.querySelector("[data-post-outdate-notice]")) {
-  import("./outdate-notice.js").then((m) => m.initOutdateNotice());
-}
-
-// ---------- 音乐胶囊（查漏补缺） ----------
+// ---------- 音乐胶囊（容器外，全局一次；换页不刷新播放） ----------
 if (document.getElementById("nav-music")) {
-  import("./music-capsule.js").then((m) => m.initMusicCapsule(controller.signal));
+  import("./music-capsule.js").then((m) => m.initMusicCapsule(globalSignal));
 }
 
-// ---------- 评论（阶段⑥）：按 provider 加载对应 bundle ----------
-if (document.getElementById("artalk-comments")) {
-  import("./comment-artalk.js").then((m) =>
-    m.initArtalk(controller.signal, {
-      server: document.getElementById("artalk-comments").dataset.server,
-      site: document.getElementById("artalk-comments").dataset.site,
-    })
-  );
+// ---------- swup 页面路由（全局一次；派发 site:page-load） ----------
+import("./swup-router.js");
+
+// ---------- 每页初始化 ----------
+let pageController = null;
+let lastPageToken = Symbol("initial");
+
+function onPageReady(importPromise, setup, controller) {
+  // 动态 import 是单例缓存；但初始化完成前页面可能已再次切换，
+  // 以 controller 身份校验避免过期实例挂到新页面上
+  importPromise.then((m) => {
+    if (!controller.signal.aborted && controller === pageController) setup(m);
+  });
 }
-if (document.getElementById("twikoo-comments")) {
-  import("./comment-twikoo.js").then((m) =>
-    m.initTwikoo({ envId: document.getElementById("twikoo-comments").dataset.envId })
-  );
+
+function initPage(event) {
+  // swup 一次换页会派发多次 site:page-load（content:replace / rAF / page:view），
+  // 同一份 newDocument 只初始化一次，避免 abort 掉刚绑好的监听
+  const token = event?.detail?.newDocument ?? event?.detail?.visit ?? null;
+  if (token && token === lastPageToken) return;
+  lastPageToken = token;
+
+  pageController?.abort();
+  const controller = new AbortController();
+  pageController = controller;
+  const signal = controller.signal;
+
+  initHeaderScroll(signal);
+  initScrollTopButton(signal);
+  initGlidePills(signal);
+  initDropdowns(signal);
+  setMobileMenu(false);
+  setMobileToc(false);
+
+  // Aurora 光效：光球/光斑跟随的宿主都在容器内
+  onPageReady(import("./aurora.js"), (m) => m.initAuroraEffects(signal), controller);
+
+  // 中控台（触发按钮在 header 内）
+  if (document.querySelector("[data-control-console-trigger]")) {
+    onPageReady(import("./control-console.js"), (m) => m.initControlConsole(signal), controller);
+  }
+
+  // 首页行为
+  if (document.getElementById("bber-talk") || document.querySelector("[data-patron-card]")) {
+    onPageReady(import("./home.js"), (m) => m.initHome(signal), controller);
+  }
+
+  // 欢迎来访者卡（首页右栏 / 文章侧栏共用）
+  if (document.getElementById("welcome-info")) {
+    onPageReady(import("./welcome-info.js"), (m) => m.initWelcomeInfo(signal), controller);
+  }
+
+  // 流量数据卡（Umami 分享接口）
+  if (document.querySelector("[data-traffic-card]")) {
+    onPageReady(import("./traffic-overview.js"), (m) => m.initTrafficOverview(signal), controller);
+  }
+
+  // 文章页行为（原 single.html 容器内脚本，改为管线统一加载）
+  if (document.getElementById("article")) {
+    onPageReady(import("./article.js"), (m) => m.initArticle(signal), controller);
+  }
+
+  // 全局灯箱：文章正文图片（说说/评论/赞赏码由各自模块经 openAnchorLightbox/openLightbox 打开）
+  onPageReady(import("./lightbox.js"), (m) => m.initLightbox(signal), controller);
+
+  // 浮动最近评论（容器外元素，但按页重置状态；ecoku 下模板不渲染、模块内部直接隐藏）
+  onPageReady(import("./floating-recent-comments.js"), (m) => m.initFloatingRecentComments(signal), controller);
+
+  // 说说页：列表页按数据源，详情页单卡走本地渲染
+  const shuoshuoFeed = document.getElementById("shuoshuo-feed");
+  if (shuoshuoFeed && shuoshuoFeed.dataset.source === "local") {
+    onPageReady(import("./shuoshuo-local.js"), (m) => m.initShuoshuoPage(signal), controller);
+  } else if (shuoshuoFeed && shuoshuoFeed.dataset.source === "tg") {
+    onPageReady(import("./shuoshuo-tg.js"), (m) => m.initShuoshuoPage(signal), controller);
+  } else if (shuoshuoFeed && shuoshuoFeed.dataset.source === "api") {
+    onPageReady(import("./shuoshuo-page.js"), (m) => m.initShuoshuoPage(signal), controller);
+  } else if (document.querySelector(".shuoshuo-feed")) {
+    onPageReady(import("./shuoshuo-local.js"), (m) => m.initShuoshuoPage(signal), controller);
+  }
+
+  // 朋友圈
+  if (document.querySelector("[data-fc-root]")) {
+    onPageReady(import("./fcircle.js"), (m) => m.initFcircle(), controller);
+  }
+
+  // 友链可达性
+  if (document.querySelector(".friend-card[data-href]")) {
+    onPageReady(import("./friend-status.js"), (m) => m.initLinkPage(signal), controller);
+  }
+
+  // 页面杂项：RSS 复制 / 申请模板 / 赞赏码灯箱
+  if (document.querySelector("[data-copy-rss]") || document.querySelector("[data-fill-apply-template]") || document.querySelector(".patron-qr-image")) {
+    onPageReady(import("./page-extras.js"), (m) => m.initPageExtras(signal), controller);
+  }
+
+  // 独立搜索页
+  if (document.getElementById("algolia-search")) {
+    onPageReady(import("./search-page.js"), (m) => m.initSearchPage(signal), controller);
+  }
+
+  // 安全跳转页
+  if (document.querySelector("[data-safego]")) {
+    onPageReady(import("./safego.js"), (m) => m.initSafego(), controller);
+  }
+
+  // 文章过期提示
+  if (document.querySelector("[data-post-outdate-notice]")) {
+    onPageReady(import("./outdate-notice.js"), (m) => m.initOutdateNotice(), controller);
+  }
+
+  // ---------- 评论（按 provider 加载对应加载器） ----------
+  if (document.getElementById("artalk-comments")) {
+    onPageReady(
+      import("./comment-artalk.js"),
+      (m) => m.initArtalk(signal, {
+        server: document.getElementById("artalk-comments").dataset.server,
+        site: document.getElementById("artalk-comments").dataset.site,
+      }),
+      controller
+    );
+  }
+  if (document.getElementById("twikoo-comments")) {
+    onPageReady(
+      import("./comment-twikoo.js"),
+      (m) => m.initTwikoo({ envId: document.getElementById("twikoo-comments").dataset.envId }),
+      controller
+    );
+  }
 }
+
+initPage();
+document.addEventListener("site:page-load", initPage);
 

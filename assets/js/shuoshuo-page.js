@@ -1,5 +1,6 @@
 // 说说页：memos echo feed（1:1 源站 shuoshuo-core 数据流 + 卡片渲染子集：文本/图片/标签/链接卡）
 import { stripTagsFromText } from "./shuoshuo-tags.js";
+import { openAnchorLightbox } from "./lightbox.js";
 
 const FEED = document.getElementById("shuoshuo-feed");
 
@@ -318,27 +319,17 @@ function watchMasonry(list, signal) {
   );
 }
 
-// 简易灯箱（对应源站 Fancybox 图片预览）
+// 灯箱：统一走全局 lightbox 模块（分组翻页，对应源站 Fancybox 图片预览）
 function initLightbox(root, signal) {
-  const overlays = Array.from(root.querySelectorAll("[data-shuoshuo-fancybox='true']"));
-  if (!overlays.length) return;
-  const overlay = el("div", "shuoshuo-lightbox");
-  overlay.hidden = true;
-  const img = el("img");
-  overlay.append(img);
-  overlay.addEventListener("click", () => {
-    overlay.classList.remove("is-open");
-    setTimeout(() => (overlay.hidden = true), 200);
-  }, { signal });
-  document.body.append(overlay);
-  overlays.forEach((a) =>
+  root.querySelectorAll("[data-shuoshuo-fancybox='true']").forEach((a) => {
+    if (a.dataset.siteLightbox === "true") return;
+    a.dataset.siteLightbox = "true";
+    a.style.cursor = "zoom-in";
     a.addEventListener("click", (e) => {
       e.preventDefault();
-      img.src = a.href;
-      overlay.hidden = false;
-      requestAnimationFrame(() => overlay.classList.add("is-open"));
-    }, { signal })
-  );
+      openAnchorLightbox(a);
+    }, { signal });
+  });
 }
 
 async function loadFeed(signal) {

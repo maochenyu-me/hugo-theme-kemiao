@@ -18,7 +18,14 @@ function loadTwikooScript() {
 
 export async function initTwikoo({ envId, path }) {
   const mount = document.getElementById("twikoo-comments");
-  if (!mount || api) return;
+  if (!mount) return;
+  // swup 换页：旧挂载点已被替换（页面里已无 #twikoo 容器），重置单例以便新页重新 init
+  if (api && !document.getElementById("twikoo")) {
+    themeObserver?.disconnect();
+    themeObserver = null;
+    api = null;
+  }
+  if (api) return;
   try {
     const twikoo = await loadTwikooScript();
     if (!document.contains(mount)) return;

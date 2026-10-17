@@ -14,7 +14,10 @@
       <section class="control-console-section control-console-recent">
         <div class="control-console-section-title"><i class="fa-regular fa-comments" aria-hidden="true"></i>最近评论</div>
         <div class="control-console-recent-host" data-recent-comments-host data-recent-comments-variant="console"
-          data-server="{{ $server }}" data-site="{{ $siteName }}" data-site-origin="{{ $origin }}"
+          data-provider="{{ $provider }}" data-server="{{ $server }}" data-site="{{ $siteName }}"
+          data-env-id="{{ site.Params.comments.twikoo.envId | default "" }}"
+          data-author-filter="{{ (site.Params.comments.recentComments | default dict).authorFilter | default "" }}"
+          data-site-origin="{{ $origin }}"
           data-display-count="10" data-fetch-count="20">
           <ul class="recent-comments-list control-console-recent-grid">
             <li class="control-console-comment-empty">加载中...</li>

@@ -1,4 +1,5 @@
-{{- /* 关于我：浮动文字 Hero + 卡片网格正文 */}}
+{{- /* 关于我：浮动文字 Hero + front matter `cards` 驱动的 6 卡片网格（1:1 源站 about-card-grid）。
+     未配置 cards 时回退为普通正文（.Content），保持向后兼容。 */}}
 {{- define "main" }}
 <section class="about-hero" aria-labelledby="about-title" data-aurora-hero>
   <div class="aurora-orb aurora-orb-1"></div>
@@ -23,5 +24,119 @@
     <p class="hero-motto">{{ .Params.motto }}</p>
   </div>
 </section>
+
+{{- $cards := .Params.cards }}
+{{- with $cards }}
+<section class="about-card-grid">
+  {{- with .profile }}
+  <section class="about-card about-card-profile">
+    <div class="panel-head"><span>Identity</span><h2>基础信息</h2></div>
+    <div class="info-list">
+      {{- range .rows }}
+      <div class="info-item"><span class="info-label">{{ .label }}</span>{{ if .link }}<a href="{{ .link }}" class="info-value" target="_blank" rel="noopener noreferrer">{{ .value }}</a>{{ else }}<span class="info-value">{{ .value }}</span>{{ end }}</div>
+      {{- end }}
+    </div>
+  </section>
+  {{- end }}
+  {{- with .personality }}
+  <section class="about-card about-card-personality">
+    <div class="panel-head"><span>Personality</span><h2>性格侧写</h2></div>
+    <div class="personality-body">
+      <div>
+        <p class="personality-type">{{ .type }}</p>
+        <p class="personality-name">{{ .name }}</p>
+        <p class="personality-summary">{{ .summary }}</p>
+        <div class="personality-traits">{{ range .traits }}<span>{{ . }}</span>{{ end }}</div>
+        {{- with .link }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">查看详情</a>{{ end }}
+      </div>
+      {{- with .image }}<img src="{{ . }}" alt="性格插图" loading="lazy" decoding="async">{{ end }}
+    </div>
+  </section>
+  {{- end }}
+  {{- with .skills }}
+  <section class="about-card about-card-skills">
+    <div class="panel-head"><span>Capabilities</span><h2>技能与工具</h2></div>
+    <div class="skills-viewport">
+      <div class="skills-lanes">
+        {{- range $rowIdx, $row := .rows }}
+        {{- $n := len $row }}
+        {{- if gt $n 0 }}
+        {{- /* 跑马灯：每组至少补到 12 个 chip 保证内容宽于卡片；两组等宽内容 + 位移 -50% 实现无缝循环 */ -}}
+        {{- $count := cond (lt $n 12) 12 $n }}
+        <div class="skills-row skills-row-{{ add $rowIdx 1 }}">
+          <div class="skills-track" style="--marquee-duration: {{ add 30 (mul $rowIdx 4) }}s">
+            {{- range $g := seq 2 }}
+            <div class="skills-group"{{ if gt $g 1 }} aria-hidden="true"{{ end }}>
+              {{- range $i := seq $count }}
+              {{- $skill := index $row (mod $i $n) }}
+              {{- $delay := printf "%.3f" (float (mul (sub $i 1) 0.025)) }}
+              <div class="skill-chip" style="--delay: {{ $delay }}s" role="img" aria-label="{{ $skill.name }}" title="{{ $skill.name }}">
+                {{- if $skill.icon }}<i class="{{ $skill.icon }}" aria-hidden="true"></i>{{ else }}<span class="skill-chip-text">{{ $skill.name }}</span>{{ end }}
+              </div>
+              {{- end }}
+            </div>
+            {{- end }}
+          </div>
+        </div>
+        {{- end }}
+        {{- end }}
+      </div>
+    </div>
+    {{- with .note }}<p class="skills-note">{{ . }}</p>{{ end }}
+  </section>
+  {{- end }}
+  {{- with .contact }}
+  <section class="about-card about-card-contact">
+    <div class="panel-head"><span>Connect</span><h2>联系与兴趣</h2></div>
+    <div class="social-grid">
+      {{- range .socials }}
+      <a class="social-card" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
+        {{- if .image }}<img src="{{ .image }}" alt="" loading="lazy" decoding="async" aria-hidden="true">
+        {{- else if .icon }}<i class="{{ .icon }}" aria-hidden="true"></i>{{ end }}
+        <span>{{ .name }}</span>
+      </a>
+      {{- end }}
+    </div>
+    {{- with .hobbies }}
+    <div class="hobby-list">{{ range . }}<span>{{ . }}</span>{{ end }}</div>
+    {{- end }}
+  </section>
+  {{- end }}
+  {{- with .projects }}
+  <section class="about-card about-card-projects">
+    <div class="panel-head"><span>Projects</span><h2>在做的事</h2></div>
+    <div class="project-list">
+      {{- range .items }}
+      <a class="project-item" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
+        <span class="project-kicker">{{ .kicker | default "Project" }}</span>
+        <strong>{{ .name }}</strong>
+        <p>{{ .desc }}</p>
+      </a>
+      {{- end }}
+    </div>
+    {{- with .focus }}
+    <div class="project-focus">
+      <span>{{ .title | default "近期节奏" }}</span>
+      <div class="project-focus-grid">
+        {{- range .items }}
+        <div class="project-focus-item"><strong>{{ .title }}</strong><p>{{ .desc }}</p></div>
+        {{- end }}
+      </div>
+    </div>
+    {{- end }}
+  </section>
+  {{- end }}
+  {{- with .evaluation }}
+  <section class="about-card about-card-evaluation">
+    <div class="panel-head"><span>Snapshot</span><h2>自我评价</h2></div>
+    <div class="evaluation-list">
+      {{- range .items }}
+      <div><span>{{ .label }}</span><p>{{ .text }}</p></div>
+      {{- end }}
+    </div>
+  </section>
+  {{- end }}
+</section>
+{{- end }}
 {{- with .Content }}{{ . }}{{ end }}
 {{- end }}

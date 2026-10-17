@@ -1,10 +1,9 @@
-// Artalk 最新评论（源站 recent-comments.js 移植）：抓取 + 过滤 + 表情还原 + 相对时间 + localStorage 缓存
-const CACHE_KEY = "newest-comments";
-const CACHE_VERSION_PREFIX = "newest-comments-v";
+// Artalk/Twikoo 最新评论（源站 recent-comments.js 移植）：抓取 + 过滤 + 表情还原 + 相对时间 + localStorage 缓存
+// 注：Ecoku 没有公开的最近评论接口（见 DejavuMoe/Ecoku），provider=ecoku 时模板层不渲染任何宿主
+const CACHE_PREFIX = "newest-comments-";
 const CACHE_TTL = 7200 * 1000;
 const FETCH_LIMIT = 20;
 const DISPLAY_LIMIT = 4;
-const AUTHOR_FILTER = "LiuShen";
 const CONTENT_MAX = 150;
 const EMOTICON_TOKEN_PREFIX = "__RECENT_COMMENT_EMOTICON_";
 const EMOTICON_TOKEN_RE = /__RECENT_COMMENT_EMOTICON_(\d+)__/g;
@@ -184,7 +183,7 @@ function latestRequest(server, site, limit) {
   };
 }
 
-async function fetchMapped(request, server, siteOrigin, fetchLimit) {
+async function fetchMapped(request, server, siteOrigin, fetchLimit, authorFilter) {
   const [commentsRes, confRes] = await Promise.all([
     fetch(request.url),
     fetch(`${server}/api/v2/conf`),
@@ -193,17 +192,49 @@ async function fetchMapped(request, server, siteOrigin, fetchLimit) {
   const conf = await confRes.json();
   return sortComments(
     request.extract(commentsData)
-      .filter((item) => item.nick !== AUTHOR_FILTER)
+      .filter((item) => !authorFilter || item.nick !== authorFilter)
       .filter((item) => sameSite(item.page_url, siteOrigin))
       .slice(0, Math.min(fetchLimit, FETCH_LIMIT))
       .map((item) => mapComment(item, conf, siteOrigin))
   );
 }
 
-// ---- localStorage 缓存（站点级，TTL 内复用） ----
-function readCache() {
+// ---- Twikoo：POST { event: "GET_RECENT_COMMENT" } ----
+async function fetchTwikoo({ envId, siteOrigin, fetchLimit, authorFilter }) {
+  const res = await fetch(envId, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event: "GET_RECENT_COMMENT" }),
+  });
+  const payload = await res.json();
+  const list = Array.isArray(payload?.data) ? payload.data : [];
+  return sortComments(
+    list
+      .filter((item) => !authorFilter || item.nick !== authorFilter)
+      .slice(0, Math.min(fetchLimit, FETCH_LIMIT))
+      .map((item) => {
+        const link = safeUrl(item.href || item.url || "", siteOrigin);
+        const summary = summarize(item.content || "", siteOrigin);
+        const created = item.created ? new Date(typeof item.created === "number" ? item.created : String(item.created)) : null;
+        return {
+          nick: item.nick || "匿名访客",
+          avatar: item.avatar || "",
+          content: summary.content,
+          contentHtml: summary.contentHtml,
+          url: link || siteOrigin,
+          pagePath: normalizeKey(link || siteOrigin),
+          commentId: null,
+          anchor: "comment-section",
+          date: created && !Number.isNaN(created.getTime()) ? created.toISOString() : "",
+        };
+      })
+  );
+}
+
+// ---- localStorage 缓存（站点级，TTL 内复用；按 provider 分键） ----
+function readCache(provider) {
   try {
-    const raw = localStorage.getItem(CACHE_KEY);
+    const raw = localStorage.getItem(CACHE_PREFIX + provider);
     if (!raw) return { ts: 0, data: [] };
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") return { ts: 0, data: [] };
@@ -216,21 +247,37 @@ function readCache() {
   }
 }
 
-function writeCache(entry) {
+function writeCache(provider, entry) {
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(entry));
+    localStorage.setItem(CACHE_PREFIX + provider, JSON.stringify(entry));
   } catch {
     // 忽略写入失败
   }
 }
 
-export async function fetchLatestComments({ server, site, displayLimit = DISPLAY_LIMIT, fetchLimit = FETCH_LIMIT, siteOrigin }) {
+export async function fetchLatestComments({
+  provider = "artalk",
+  server = "",
+  site = "",
+  envId = "",
+  authorFilter = "",
+  displayLimit = DISPLAY_LIMIT,
+  fetchLimit = FETCH_LIMIT,
+  siteOrigin,
+}) {
   const now = Date.now();
-  const cache = readCache();
+  const cache = readCache(provider);
   if (cache.data.length && now - cache.ts <= CACHE_TTL) {
     return sortComments(cache.data).slice(0, displayLimit);
   }
-  const list = await fetchMapped(latestRequest(server, site, fetchLimit), server, siteOrigin, fetchLimit);
-  writeCache({ ts: now, data: list });
+  let list;
+  if (provider === "twikoo") {
+    if (!envId) throw new Error("twikoo envId missing");
+    list = await fetchTwikoo({ envId, siteOrigin, fetchLimit, authorFilter });
+  } else {
+    if (!server || !site) throw new Error("artalk server/site missing");
+    list = await fetchMapped(latestRequest(server, site, fetchLimit), server, siteOrigin, fetchLimit, authorFilter);
+  }
+  writeCache(provider, { ts: now, data: list });
   return list.slice(0, displayLimit);
 }

@@ -16,7 +16,7 @@ const TOGGLE_ACTIONS = new Set(["musicCapsule", "recentComments", "contextMenu",
 
 const MESSAGES = {
   musicCapsule: { enabled: "音乐胶囊已显示。", disabled: "音乐胶囊已隐藏，并已暂停当前播放。" },
-  recentComments: { enabled: "最近评论弹窗已开启。", disabled: "最近评论弹窗已隐藏。" },
+  recentComments: { enabled: "最近评论浮窗已开启。", disabled: "最近评论浮窗已隐藏。" },
   contextMenu: { enabled: "右键菜单已开启。", disabled: "右键菜单已关闭，将使用浏览器原生菜单。" },
   yozaiFont: { enabled: "已切换为悠哉文楷。", disabled: "已切换为系统字体。" },
   theme: { changed: (mode) => `主题模式已切换为${mode}。` },
@@ -51,16 +51,20 @@ function renderConsoleComments(listEl, items) {
 }
 
 async function loadHost(host) {
+  const provider = host.dataset.provider || "artalk";
   const server = host.dataset.server;
   const site = host.dataset.site;
+  const envId = host.dataset.envId;
+  const authorFilter = host.dataset.authorFilter || "";
   const displayCount = Number(host.dataset.displayCount) || DISPLAY_LIMIT;
   const fetchCount = Math.max(displayCount, Number(host.dataset.fetchCount) || FETCH_LIMIT);
   const siteOrigin = host.dataset.siteOrigin;
   const listEl = host.querySelector(".recent-comments-list");
-  if (!server || !site || !(listEl instanceof HTMLElement)) return;
+  if (!(listEl instanceof HTMLElement)) return;
+  if (provider === "twikoo" ? !envId : !server || !site) return;
   host.dataset.loaded = "true";
   try {
-    const items = await fetchLatestComments({ server, site, displayLimit: displayCount, fetchLimit: fetchCount, siteOrigin });
+    const items = await fetchLatestComments({ provider, server, site, envId, authorFilter, displayLimit: displayCount, fetchLimit: fetchCount, siteOrigin });
     renderConsoleComments(listEl, items);
   } catch {
     listEl.innerHTML = `<li class="text-[0.9375rem] text-foreground/40">评论加载失败</li>`;

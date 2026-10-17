@@ -18,6 +18,5 @@
   <button type="button" class="fc-more" data-fc-more hidden>再来亿点</button>
   <p class="fc-meta" data-fc-meta></p>
 </section>
-{{- $js := resources.Get "js/fcircle.js" | js.Build (dict "minify" true) | fingerprint }}
-<script type="module" src="{{ $js.RelPermalink }}"></script>
+{{- /* 朋友圈行为由 site.js 初始化管线加载（swup 换页后重挂） */ -}}
 {{- end }}

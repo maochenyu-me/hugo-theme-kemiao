@@ -30,6 +30,9 @@
   {{- /* 音乐胶囊（源站位置：main 之后、body 末尾区） */}}
   {{- partial "music-capsule.html" . -}}
 
+  {{- /* 浮动最近评论（源站位置：music-capsule 之后；ecoku 无接口不渲染） */}}
+  {{- partial "floating-recent-comments.html" . -}}
+
   {{- /* 源站 DOM 无 .site-cursor-glow 元素（仅 CSS/JS 遗留），不渲染，避免绝对定位 800px 撑高文档 */}}
 
   {{- /* 不蒜子统计（soxft/busuanzi 自部署版）：延迟注入器。

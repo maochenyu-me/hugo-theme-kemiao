@@ -28,8 +28,6 @@
   </div>
 </section>
 {{- partial "comment-section.html" . }}
-{{- $js := resources.Get "js/shuoshuo-local.js" | js.Build (dict "minify" true) | fingerprint }}
-<script type="module" src="{{ $js.RelPermalink }}"></script>
 {{- else if eq $source "tg" }}
 {{- $tg := site.Params.shuoshuo.tg }}
 <section class="mt-8">
@@ -63,8 +61,6 @@
   </div>
 </section>
 {{- partial "comment-section.html" . }}
-{{- $js := resources.Get "js/shuoshuo-tg.js" | js.Build (dict "minify" true) | fingerprint }}
-<script type="module" src="{{ $js.RelPermalink }}"></script>
 {{- else }}
 <section class="mt-8">
   <div id="shuoshuo-feed" class="shuoshuo-feed" data-source="api"
@@ -96,7 +92,5 @@
   </div>
 </section>
 {{- partial "comment-section.html" . }}
-{{- $js := resources.Get "js/shuoshuo-page.js" | js.Build (dict "minify" true) | fingerprint }}
-<script type="module" src="{{ $js.RelPermalink }}"></script>
 {{- end }}
 {{- end }}

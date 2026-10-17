@@ -1,4 +1,6 @@
 // 页面小工具：订阅复制 / 申请模板填充 / 赞赏页灯箱与支持者跳转
+import { openLightbox } from "./lightbox.js";
+
 function toast(msg) {
   let bar = document.getElementById("kb-snackbar");
   if (!bar) {
@@ -52,31 +54,20 @@ function initApplyFill(signal) {
   }, { signal });
 }
 
-// 赞赏页：收款码灯箱 + 支持者整卡跳转
+// 赞赏页：收款码灯箱（统一全局灯箱） + 支持者整卡跳转
 function initRewards(signal) {
   const images = Array.from(document.querySelectorAll(".patron-qr-image"));
-  if (images.length) {
-    const overlay = document.createElement("div");
-    overlay.className = "qr-lightbox";
-    overlay.hidden = true;
-    const img = document.createElement("img");
-    overlay.append(img);
-    overlay.addEventListener("click", () => {
-      overlay.classList.remove("is-open");
-      setTimeout(() => (overlay.hidden = true), 200);
+  images.forEach((box) => {
+    if (box.dataset.siteLightbox === "true") return;
+    box.dataset.siteLightbox = "true";
+    box.style.cursor = "zoom-in";
+    box.addEventListener("click", (e) => {
+      e.preventDefault();
+      const img = box.querySelector("img");
+      if (!img?.src) return;
+      openLightbox([{ src: img.src, caption: img.alt || "收款码" }], 0);
     }, { signal });
-    document.body.append(overlay);
-    images.forEach((box, i) =>
-      box.addEventListener("click", (e) => {
-        e.preventDefault();
-        const src = box.querySelector("img")?.src;
-        if (!src) return;
-        img.src = src;
-        overlay.hidden = false;
-        requestAnimationFrame(() => overlay.classList.add("is-open"));
-      }, { signal })
-    );
-  }
+  });
   document.querySelectorAll(".backer-linkable[data-href]").forEach((card) => {
     card.addEventListener("click", () => window.open(card.dataset.href, "_blank", "noopener,noreferrer"), { signal });
   });

@@ -1,0 +1,50 @@
+{{- /* 浮动最近评论（源站 FloatingRecentComments.astro 1:1）：
+     仅 artalk/twikoo 渲染（ecoku 无公开最近评论接口）；行为在 assets/js/floating-recent-comments.js。
+     放置在 swup 容器外（baseof），换页不重建，由 JS 按页重置状态。 */ -}}
+{{- $provider := site.Params.comments.provider | default "artalk" -}}
+{{- if ne $provider "ecoku" -}}
+{{- $artalk := site.Params.comments.artalk -}}
+{{- $twikoo := site.Params.comments.twikoo -}}
+{{- $server := $artalk.server | default "" -}}
+{{- $siteName := $artalk.site | default site.Title -}}
+{{- $envId := $twikoo.envId | default "" -}}
+{{- $authorFilter := (site.Params.comments.recentComments | default dict).authorFilter | default "" -}}
+<aside data-floating-recent-comments
+  data-provider="{{ $provider }}"
+  data-server="{{ $server }}"
+  data-site="{{ $siteName }}"
+  data-env-id="{{ $envId }}"
+  data-site-origin="{{ site.BaseURL }}"
+  data-author-filter="{{ $authorFilter }}"
+  data-floating-recent-comments-closed="false"
+  hidden aria-hidden="true"
+  class="fixed right-3 bottom-3 z-50 hidden w-[20rem] max-w-[calc(100vw-1.5rem)] lg:flex lg:flex-col pointer-events-none translate-y-2 opacity-0 transition-all duration-300 ease-out motion-reduce:translate-y-0 motion-reduce:transition-none">
+  <div data-recent-comment-panel-stage class="relative h-[7.45rem] w-full">
+    {{- range $i := seq 2 }}{{- $idx := sub $i 1 }}
+    <section data-recent-comment-panel="{{ $idx }}" data-recent-comment-panel-active="{{ eq $idx 0 }}" aria-hidden="{{ ne $idx 0 }}"
+      class="recent-comment-panel absolute inset-0 overflow-hidden rounded-2xl text-foreground {{ if eq $idx 0 }}opacity-100{{ else }}pointer-events-none opacity-0{{ end }}">
+      <div class="flex items-center justify-between gap-3 border-b border-dashed border-border/20 px-3.5 py-2">
+        <div class="flex min-w-0 items-center gap-2.5">
+          <img data-recent-comment-avatar src="{{ site.Params.avatar | default "/info/avatar.ico" }}" alt=""
+            class="size-6 shrink-0 rounded-full border border-accent/45 bg-accent/10 object-cover p-px shadow-sm shadow-accent/10"
+            loading="lazy" decoding="async">
+          <span data-recent-comment-nick class="min-w-0 truncate text-[0.875rem] font-bold text-foreground">最近访客</span>
+        </div>
+        <div class="flex shrink-0 items-center gap-2">
+          <button type="button" data-recent-comment-section-link
+            class="font-cartograph text-[0.8125rem] font-bold text-accent/70 transition-colors duration-200 hover:text-accent">评论</button>
+          <button type="button" data-recent-comment-close aria-label="关闭最近评论轮播" title="关闭最近评论轮播"
+            class="flex size-6 items-center justify-center rounded-full border border-border/20 bg-foreground/3 text-foreground/60 transition-colors duration-200 hover:border-accent/30 hover:text-accent">
+            <i class="fa-solid fa-xmark text-[0.6875rem] leading-none" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <a data-recent-comment-link href="#comment-section" class="group block px-3.5 py-2.5 text-foreground no-underline">
+        <p data-recent-comment-content
+          class="recent-comment-content floating-recent-comment-content text-[0.9375rem] text-foreground/72 transition-colors duration-200 group-hover:text-accent">正在加载最近评论...</p>
+      </a>
+    </section>
+    {{- end }}
+  </div>
+</aside>
+{{- end }}

@@ -1,6 +1,8 @@
 // Artalk 评论加载器（阶段⑥，1:1 源站 comment.Vj6d3Bu_.js 核心语义）
 // init(server, site, pageKey) → 主题联动 + 评论图片灯箱 + owo 表情放大
 // Artalk 库从 /vendor/artalk.js 运行时动态加载（192KB，不进主 bundle）
+import { openLightbox } from "./lightbox.js";
+
 let instance = null;
 let themeObserver = null;
 let controller = null;
@@ -16,47 +18,7 @@ function normalizePageKey(pathname) {
   return p.endsWith("/") ? p : `${p}/`;
 }
 
-// ---------- 评论图片灯箱（与说说页 shuoshuo-lightbox 同构的轻量实现） ----------
-function buildLightbox(items, index) {
-  document.querySelector(".comment-lightbox")?.remove();
-  const overlay = document.createElement("div");
-  overlay.className = "comment-lightbox";
-  overlay.setAttribute("role", "dialog");
-  overlay.setAttribute("aria-modal", "true");
-  overlay.innerHTML = `
-    <button class="comment-lightbox-close" aria-label="关闭">✕</button>
-    <div class="comment-lightbox-stage"><img alt="${items[index].caption || ""}"></div>
-    ${items.length > 1 ? '<button class="comment-lightbox-prev" aria-label="上一张">‹</button><button class="comment-lightbox-next" aria-label="下一张">›</button>' : ""}
-    <div class="comment-lightbox-counter">${index + 1} / ${items.length}</div>`;
-  const img = overlay.querySelector("img");
-  const counter = overlay.querySelector(".comment-lightbox-counter");
-  let cur = index;
-  const show = (i) => {
-    cur = (i + items.length) % items.length;
-    img.src = items[cur].src;
-    img.alt = items[cur].caption || "";
-    if (counter) counter.textContent = `${cur + 1} / ${items.length}`;
-  };
-  show(cur);
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay || e.target.closest(".comment-lightbox-close")) overlay.remove();
-    else if (e.target.closest(".comment-lightbox-prev")) show(cur - 1);
-    else if (e.target.closest(".comment-lightbox-next")) show(cur + 1);
-  });
-  const onKey = (e) => {
-    if (!overlay.isConnected) {
-      document.removeEventListener("keydown", onKey);
-      return;
-    }
-    if (e.key === "Escape") { overlay.remove(); document.removeEventListener("keydown", onKey); }
-    if (e.key === "ArrowLeft") show(cur - 1);
-    if (e.key === "ArrowRight") show(cur + 1);
-  };
-  document.addEventListener("keydown", onKey);
-  document.body.append(overlay);
-  requestAnimationFrame(() => overlay.classList.add("is-open"));
-}
-
+// ---------- 评论图片灯箱：统一走全局 lightbox 模块 ----------
 function bindCommentImages(rootEl) {
   const sel = ".atk-content img:not([atk-emoticon])";
   rootEl.querySelectorAll(sel).forEach((img) => {
@@ -68,7 +30,7 @@ function bindCommentImages(rootEl) {
       const scope = img.closest(".atk-comment-children") || rootEl;
       const all = Array.from(scope.querySelectorAll(sel)).filter((i) => i.currentSrc || i.src);
       const idx = Math.max(0, all.indexOf(img));
-      buildLightbox(all.map((i) => ({ src: i.currentSrc || i.src, caption: i.alt })), idx);
+      openLightbox(all.map((i) => ({ src: i.currentSrc || i.src, caption: i.alt })), idx);
     });
   });
 }
@@ -126,7 +88,11 @@ function bindOwoZoom() {
 
 export async function initArtalk(signal, { server, site }) {
   controller = new AbortController();
-  signal?.addEventListener("abort", () => controller.abort(), { once: true });
+  // swup 换页：旧页的 Artalk 实例随监听一并销毁，新页重新 init
+  signal?.addEventListener("abort", () => {
+    controller.abort();
+    destroyArtalk();
+  }, { once: true });
   const mount = document.getElementById("artalk-comments");
   if (!mount || instance) return;
 

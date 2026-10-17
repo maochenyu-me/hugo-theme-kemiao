@@ -77,5 +77,5 @@
 
 {{- /* 统计（默认关闭，配置后启用） */}}
 {{- with $site.umami }}{{ if .enable }}
-<script defer src="{{ .src }}" data-website-id="{{ .websiteId }}" data-domains="{{ .domains }}"></script>
+<script defer src="{{ .src }}" data-website-id="{{ .websiteId }}"{{ with .domains }} data-domains="{{ . }}"{{ end }}></script>
 {{ end }}{{ end -}}

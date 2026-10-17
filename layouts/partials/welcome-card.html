@@ -8,7 +8,12 @@
       <p>我是清扬，一个 <strong>热爱编程</strong> 的技术爱好者，喜欢记录折腾过程，也喜欢把踩过的坑写成路标。</p>
       <p>有问题欢迎提问，建议先看看<a href="https://how-to-ask.liushen.fun/" target="_blank" rel="noopener noreferrer">提问的智慧</a>；如果需要联系我，也可以直接发<a href="mailto:01@liushen.fun">邮件</a>。</p>
     </div>
-    <div id="welcome-info" class="welcome-info" aria-live="polite">
+    {{- $welcome := site.Params.welcome | default dict }}
+    <div id="welcome-info" class="welcome-info" aria-live="polite"
+      data-api="{{ $welcome.api | default "https://60s-api.518339.xyz/v2/ip" }}"
+      data-origin-lat="{{ $welcome.originLat | default 0 }}"
+      data-origin-lng="{{ $welcome.originLng | default 0 }}"
+      data-cache-ttl="{{ $welcome.cacheTtl | default 3600 }}">
       <div class="welcome-loading">
         <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
         <span>正在辨认风从哪里来...</span>

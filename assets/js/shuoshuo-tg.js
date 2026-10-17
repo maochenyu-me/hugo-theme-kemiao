@@ -63,6 +63,7 @@ import {
   stripTagsFromText,
   stripTagsFromHtml,
 } from "./shuoshuo-tags.js";
+import { openAnchorLightbox } from "./lightbox.js";
 
 // 注意：innerHTML 解析后 tagName 恒为大写，故用 "TG-SPOILER" 而非 "TG_SPOILER"
 const ALLOWED_TAGS = new Set([
@@ -337,28 +338,14 @@ function watchMasonry(list, signal) {
 
 /** 灯箱：事件委托，后追加的卡片自动生效 */
 function initLightbox(root, signal) {
-  const overlay = el("div", "shuoshuo-lightbox");
-  overlay.hidden = true;
-  const img = el("img");
-  overlay.append(img);
-  overlay.addEventListener(
-    "click",
-    () => {
-      overlay.classList.remove("is-open");
-      setTimeout(() => (overlay.hidden = true), 200);
-    },
-    { signal }
-  );
-  document.body.append(overlay);
+  // 委托绑定（loadMore 动态追加的卡片无需重复绑定），打开走全局灯箱
   root.addEventListener(
     "click",
     (e) => {
       const a = e.target instanceof Element && e.target.closest("[data-shuoshuo-fancybox='true']");
       if (!a) return;
       e.preventDefault();
-      img.src = a.getAttribute("href") || "";
-      overlay.hidden = false;
-      requestAnimationFrame(() => overlay.classList.add("is-open"));
+      openAnchorLightbox(a);
     },
     { signal }
   );

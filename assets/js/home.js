@@ -22,6 +22,8 @@ function initPatronCarousel(signal) {
 
 function startTicker(list) {
   if (list.children.length <= 1) return;
+  // swup 换页重挂：先清掉上一页遗留的跑马灯计时器
+  if (window.__homeTickerTimer) { window.clearInterval(window.__homeTickerTimer); window.__homeTickerTimer = null; }
   window.__homeTickerTimer = window.setInterval(() => {
     if (list.children.length <= 1) return;
     const first = list.children[0];
@@ -137,11 +139,6 @@ function initCardGlow(signal) {
 }
 
 // 欢迎卡片访客信息（占位：源站走 IP 地理接口，接好统计后在 home 配置里补）
-function initWelcomeInfo() {
-  const box = document.getElementById("welcome-info");
-  if (!box) return;
-}
-
 export function initHome(signal) {
   initPatronCarousel(signal);
   const talk = document.getElementById("bber-talk");
@@ -154,5 +151,4 @@ export function initHome(signal) {
   }
   initWebinfoTime();
   initCardGlow(signal);
-  initWelcomeInfo();
 }

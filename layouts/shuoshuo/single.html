@@ -16,6 +16,5 @@
   </div>
 </section>
 {{- partial "comment-section.html" . }}
-{{- $js := resources.Get "js/shuoshuo-local.js" | js.Build (dict "minify" true) | fingerprint }}
-<script type="module" src="{{ $js.RelPermalink }}"></script>
+{{- /* 说说详情页行为由 site.js 初始化管线加载（swup 换页后重挂） */ -}}
 {{- end }}

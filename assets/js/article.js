@@ -215,16 +215,5 @@ function initArticle(signal) {
   initBackButton();
 }
 
-function init() {
-  const controller = new AbortController();
-  initArticle(controller.signal);
-  return controller;
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => init());
-} else {
-  init();
-}
-
+// 初始化由 site.js 每页管线驱动（swup 换页后随新 DOM 重挂）
 export { initArticle };
