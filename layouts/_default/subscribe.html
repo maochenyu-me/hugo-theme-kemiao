@@ -3,7 +3,7 @@
      不再写死源站域名。data 缺失时回退渲染 md 正文。 */}}
 {{- define "main" }}
 {{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
-{{- $d := site.Data.pages.subscribe }}
+{{- $d := hugo.Data.pages.subscribe }}
 {{- $base := strings.TrimSuffix "/" site.BaseURL }}
 {{- $rss := printf "%s/atom.xml" $base }}
 {{- if $d }}

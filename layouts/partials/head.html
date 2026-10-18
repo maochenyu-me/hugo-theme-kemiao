@@ -34,7 +34,7 @@
        all.subset.min.css 由 tools/subset-fa-css.py 生成（只留用到的图标定义，73KB→12KB），
        新增图标后重跑该脚本（配套 tools/subset-fonts.py 裁字体）。 */}}
 {{- if eq ($site.icons.provider | default "local") "cdn" }}
-<link rel="preconnect" href="https://jsd.liiiu.cn" crossorigin>
+<link rel="preconnect" href="{{ (urls.Parse $site.icons.cdn).Scheme }}://{{ (urls.Parse $site.icons.cdn).Host }}" crossorigin>
 <link rel="stylesheet" href="{{ $site.icons.cdn }}">
 {{- else }}
 <link rel="stylesheet" href="/fontawesome/css/all.subset.min.css">

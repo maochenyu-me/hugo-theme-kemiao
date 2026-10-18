@@ -3,7 +3,7 @@
      data 缺失时回退渲染 md 正文（向后兼容）。 */}}
 {{- define "main" }}
 {{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
-{{- $d := site.Data.pages.addlink }}
+{{- $d := hugo.Data.pages.addlink }}
 {{- if $d }}
 <div class="apply-grid">
   {{- /* 申请流程 */}}

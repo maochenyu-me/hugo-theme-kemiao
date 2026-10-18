@@ -14,7 +14,7 @@
           <a class="patron-more" href="{{ $sb.patron.moreUrl }}" aria-label="查看全部赞赏者">{{ $sb.patron.moreLabel }}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
         </div>
         <div class="patron-carousel" aria-label="赞赏者轮播">
-          {{- range $i, $p := hugo.Data.patrons }}
+          {{- range $i, $p := hugo.Data.backers }}
           {{- if $p.url }}
           <a href="{{ $p.url }}" target="_blank" rel="noopener noreferrer" class="patron-slide{{ if eq $i 0 }} patron-slide-active{{ end }}" data-patron-slide>
           {{- else }}
@@ -28,7 +28,7 @@
                 <div class="patron-desc">{{ $p.desc }}</div>
               </div>
             </div>
-            <div class="patron-slide-foot"><span>¥{{ $p.amount }}</span><span>{{ $p.date }}</span></div>
+            <div class="patron-slide-foot"><span>{{ $p.amount }}</span><span>{{ $p.date }}</span></div>
           {{- if $p.url }}</a>{{ else }}</article>{{ end }}
           {{- end }}
         </div>

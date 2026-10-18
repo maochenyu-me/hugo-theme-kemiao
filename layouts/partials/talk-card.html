@@ -41,7 +41,10 @@
           {{- /* 运行时由 home.js 填充（拉 tg 最新 tickerCount 条） */}}
           <li class="item is-active"><span class="talk-text">正在加载最近的说说...</span></li>
           {{- else }}
-          {{- range $i, $t := hugo.Data.shuoshuoTicker }}
+          {{- /* api 数据源的静态兜底：data/shuoshuoTicker.yaml（可选，删除该文件则显示占位文案） */}}
+          {{- $ticker := hugo.Data.shuoshuoTicker }}
+          {{- if $ticker }}
+          {{- range $i, $t := $ticker }}
           <li class="item{{ if eq $i 0 }} is-active{{ end }}">
             <span class="talk-text">{{ $t.text }}</span>
             {{- with $t.icons }}
@@ -50,6 +53,9 @@
             </span>
             {{- end }}
           </li>
+          {{- end }}
+          {{- else }}
+          <li class="item is-active"><span class="talk-text">最近没有新的说说～</span></li>
           {{- end }}
           {{- end }}
         </ul>

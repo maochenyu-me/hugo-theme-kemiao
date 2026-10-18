@@ -3,7 +3,7 @@
 {{- define "main" }}
 {{- partial "breadcrumb.html" (dict "label" "Comment") }}
 {{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
-{{- $d := site.Data.pages.comment }}
+{{- $d := hugo.Data.pages.comment }}
 {{- if $d }}
 <section class="comment-intro app-card">
   <div>
