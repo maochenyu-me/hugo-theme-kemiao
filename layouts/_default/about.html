@@ -71,7 +71,9 @@
               {{- $skill := index $row (mod $i $n) }}
               {{- $delay := printf "%.3f" (float (mul (sub $i 1) 0.025)) }}
               <div class="skill-chip" style="--delay: {{ $delay }}s" role="img" aria-label="{{ $skill.name }}" title="{{ $skill.name }}">
-                {{- if $skill.icon }}<i class="{{ $skill.icon }}" aria-hidden="true"></i>{{ else }}<span class="skill-chip-text">{{ $skill.name }}</span>{{ end }}
+                {{- if $skill.svg }}<span class="skill-chip-svg" aria-hidden="true">{{ $skill.svg | safeHTML }}</span>
+                {{- else if $skill.icon }}<i class="{{ $skill.icon }}" aria-hidden="true"></i>
+                {{- else }}<span class="skill-chip-text">{{ $skill.name }}</span>{{ end }}
               </div>
               {{- end }}
             </div>

@@ -1,7 +1,29 @@
-{{- /* 通用：Hero + 正文（prose-hero：statement/info 等） */}}
+{{- /* 长文页块渲染：data/pages/<page>.yaml 的 blocks（h2/h3/h4/p/ul/ol；ul/ol 项支持 text+sub 一层嵌套）。
+     行内内容是 HTML 片段（strong/code/a 等），直接 safeHTML。data 缺失时回退渲染 md 正文。 */}}
 {{- define "main" }}
+{{- $d := index hugo.Data.pages .File.ContentBaseName }}
 {{- partial "page-hero.html" (dict "title" .Params.hero.title "desc" .Params.hero.desc "badges" .Params.hero.badges "gradient" .Params.hero.gradient) }}
-{{- with .Content }}
-<section class="app-prose mb-16 max-w-app prose-img:border-0">{{ . }}</section>
+{{- if $d }}
+<section class="app-prose mb-16 max-w-app prose-img:border-0">
+  {{- range $d.blocks }}
+    {{- if reflect.IsMap . }}
+    {{- if isset . "h2" }}
+    <h2 id="{{ .id | default (.h2 | anchorize) }}">{{ .h2 | safeHTML }}</h2>
+    {{- else if isset . "h3" }}
+    <h3 id="{{ .id | default (.h3 | anchorize) }}">{{ .h3 | safeHTML }}</h3>
+    {{- else if isset . "h4" }}
+    <h4 id="{{ .id | default (.h4 | anchorize) }}">{{ .h4 | safeHTML }}</h4>
+    {{- else if isset . "p" }}
+    <p>{{ .p | safeHTML }}</p>
+    {{- else if isset . "ul" }}
+    <ul>{{ partial "prose-list-items.html" (dict "items" .ul "tag" "ul") }}</ul>
+    {{- else if isset . "ol" }}
+    <ol>{{ partial "prose-list-items.html" (dict "items" .ol "tag" "ol") }}</ol>
+    {{- end }}
+    {{- end }}
+  {{- end }}
+</section>
+{{- else }}
+<section class="app-prose mb-16 max-w-app prose-img:border-0">{{ .Content }}</section>
 {{- end }}
 {{- end }}

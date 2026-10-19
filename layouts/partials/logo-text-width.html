@@ -1,0 +1,13 @@
+{{- /* Logo 文本宽度估算（返回 em 数）：
+     CJK / 全角字符 = 1.0，窄标点 = 0.45，其余 ASCII（字母数字花括号等）= 0.6
+     输入：字符串（partial 参数即文本本身） */}}
+{{- $w := 0.0 }}
+{{- range $ch := split . "" }}
+  {{- if eq $ch "" }}{{ continue }}{{ end }}
+  {{- if findRE `[\x00-\x7F]` $ch }}
+    {{- if findRE `[.,:;'"|!]` $ch }}{{ $w = add $w 0.45 }}
+    {{- else }}{{ $w = add $w 0.6 }}{{ end }}
+  {{- else if findRE `[·•°]` $ch }}{{ $w = add $w 0.45 }}
+  {{- else }}{{ $w = add $w 1.0 }}{{ end }}
+{{- end }}
+{{- return $w }}

@@ -9,29 +9,21 @@
             <img src="{{ $p.avatar }}" alt="" class="footer-avatar size-8 rounded-full object-cover" loading="lazy" decoding="async" aria-hidden="true">
             {{- partial "logo-svg.html" (dict "class" "footer-logo h-8 w-auto") }}
           </a>
-          <p class="max-w-xl text-[0.9375rem] leading-relaxed text-foreground/58">好奇心转化为代码的空间。</p>
+          <p class="max-w-xl text-[0.9375rem] leading-relaxed text-foreground/58">{{ $p.footerTagline }}</p>
         </div>
         <nav aria-labelledby="footer-social-heading" class="flex flex-col items-center gap-2 md:items-end">
           <p id="footer-social-heading" class="text-[0.9375rem] tracking-wide text-foreground/48">联系方式</p>
+          {{- /* 联系方式图标：默认复用 params.hero.socials；如需单独定制，配 params.footerSocials 覆盖 */}}
+          {{- $socials := site.Params.footerSocials | default $p.hero.socials }}
           <ul class="flex flex-wrap items-center justify-center gap-2 md:justify-end" role="list">
+            {{- range $socials }}
             <li>
-              <a tabindex="0" href="mailto:01@liushen.fun" aria-label="发送邮件给 {{ $p.author }}" title="发送邮件给 {{ $p.author }}" class="group inline-flex items-center gap-1 hover:text-accent footer-social-btn group relative flex size-9 items-center justify-center rounded-xl border border-border/20 bg-muted/20 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:bg-accent/10 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:outline-none">
-                <i class="fa-solid fa-envelope text-[1.05rem] leading-none text-foreground/60 transition-all duration-300 group-hover:text-accent" aria-hidden="true"></i>
-                <span class="sr-only">发送邮件给 {{ $p.author }}</span>
+              <a tabindex="0" href="{{ .url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ .title }}" title="{{ .title }}" class="group relative flex size-9 items-center justify-center rounded-xl border border-border/20 bg-muted/20 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:bg-accent/10 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:outline-none">
+                <i class="{{ .icon }} text-[1.05rem] leading-none text-foreground/60 transition-all duration-300 group-hover:text-accent" aria-hidden="true"></i>
+                <span class="sr-only">{{ .title }}</span>
               </a>
             </li>
-            <li>
-              <a tabindex="0" href="http://wpa.qq.com/msgrd?v=3&amp;uin=3162475700&amp;site=qq&amp;menu=yes" target="_blank" rel="noopener noreferrer" aria-label="通过 QQ 联系 {{ $p.author }}" title="通过 QQ 联系 {{ $p.author }}" class="group inline-flex items-center gap-1 hover:text-accent footer-social-btn group relative flex size-9 items-center justify-center rounded-xl border border-border/20 bg-muted/20 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:bg-accent/10 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:outline-none">
-                <i class="fa-brands fa-qq text-[1.05rem] leading-none text-foreground/60 transition-all duration-300 group-hover:text-accent" aria-hidden="true"></i>
-                <span class="sr-only">通过 QQ 联系 {{ $p.author }}</span>
-              </a>
-            </li>
-            <li>
-              <a tabindex="0" href="https://github.com/willow-god" target="_blank" rel="noopener noreferrer" aria-label="{{ $p.author }} 的 GitHub" title="{{ $p.author }} 的 GitHub" class="group inline-flex items-center gap-1 hover:text-accent footer-social-btn group relative flex size-9 items-center justify-center rounded-xl border border-border/20 bg-muted/20 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:bg-accent/10 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:outline-none">
-                <i class="fa-brands fa-github text-[1.05rem] leading-none text-foreground/60 transition-all duration-300 group-hover:text-accent" aria-hidden="true"></i>
-                <span class="sr-only">{{ $p.author }} 的 GitHub</span>
-              </a>
-            </li>
+            {{- end }}
           </ul>
           <div class="footer-line justify-center text-foreground/52 md:justify-end">
             <a href="/info/" class="footer-inline-link">发展历程</a>
@@ -56,11 +48,22 @@
         </div>
         <div class="flex flex-col items-center gap-2 text-center md:items-end md:text-end">
           <p id="footer-runtime" data-runtime-start="{{ $p.runtimeStart }}" class="footer-line text-foreground/58" aria-live="polite">本站已苟活: 0 天 00 时 00 分 00 秒</p>
-          <ul class="footer-line flex flex-wrap items-center justify-center text-foreground/52 md:justify-end" role="list">
-            <li>
-              <span class="footer-inline-link" title="HUGO">{{ $p.footerCredit }}</span>
-            </li>
-          </ul>
+          <div class="footer-line flex flex-wrap items-center justify-center text-foreground/52 md:justify-end">
+            {{- $credits := site.Params.footerCredits | default slice }}
+            {{- if eq (len $credits) 0 }}
+              {{- $credits = slice (dict "text" site.Params.footerCredit "url" site.Params.footerCreditUrl "newTab" site.Params.footerCreditNewTab) }}
+            {{- end }}
+            {{- range $i, $c := $credits }}
+              {{- if $c.text }}
+                {{- if $i }}<span class="footer-separator" aria-hidden="true"></span>{{ end }}
+                {{- if $c.url }}
+                <a href="{{ $c.url }}" class="footer-inline-link" title="{{ $c.text }}"{{ if $c.newTab }} target="_blank" rel="noopener noreferrer"{{ end }}>{{ $c.text }}</a>
+                {{- else }}
+                <span class="footer-inline-link" title="{{ $c.text }}">{{ $c.text }}</span>
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          </div>
         </div>
       </div>
     </div>

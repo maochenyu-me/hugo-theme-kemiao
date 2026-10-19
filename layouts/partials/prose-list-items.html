@@ -1,0 +1,9 @@
+{{- /* prose 列表项：item 为字符串（行内 HTML）或 {text, sub:[{tag, items}]}（一层嵌套子列表）
+     注意：<{{ .tag }}> 里的 < 会被 html/template 转义，必须用 printf + safeHTML 输出标签 */}}
+{{- range .items }}
+{{- if reflect.IsMap . }}
+<li>{{ .text | safeHTML }}{{ with .sub }}{{ range . }}{{ printf "<%s>" .tag | safeHTML }}{{ range .items }}<li>{{ if reflect.IsMap . }}{{ .text | safeHTML }}{{ else }}{{ . | safeHTML }}{{ end }}</li>{{ end }}{{ printf "</%s>" .tag | safeHTML }}{{ end }}{{ end }}</li>
+{{- else }}
+<li>{{ . | safeHTML }}</li>
+{{- end }}
+{{- end }}

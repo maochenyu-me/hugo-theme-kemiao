@@ -467,7 +467,9 @@ node tools/build.mjs --no-pf  # 跳过 pagefind 索引
 
 ### 独立页面文案：`data/pages/*.yaml`
 
-友链申请（addlink）、订阅（subscribe）、留言板（comment）这类「结构化 UI 页」的文案不在 md 里，在 `data/pages/<页面名>.yaml`，由对应模板（`layouts/_default/<page>.html`）渲染，**改文案改 YAML，不动模板**：
+友链申请（addlink）、订阅（subscribe）、留言板（comment）这类「结构化 UI 页」的文案不在 md 里，在 `data/pages/<页面名>.yaml`，由对应模板（`layouts/_default/<page>.html`）渲染，**改文案改 YAML，不动模板**。
+
+长 prose 页（隐私政策 statement、发展历程 info）同走这个模式，但数据是 `blocks` 块列表（`h2/h3/h4` 标题、`p` 段落、`ul/ol` 列表，行内允许 HTML 片段，列表项支持 `text + sub` 一层嵌套），由 `prose-hero.html` + `prose-list-items.html` 渲染：
 
 - 站点相关信息（站名、域名、头像、RSS 地址、友链申请的「本站信息」模板）**不放在文案文件里**，模板直接读 `hugo.toml` 的参数（`title` / `baseURL` / `avatar` / `description` / `siteshot`），一处配置全站生效。
 - `content/<page>.md` 只保留 front matter（title / description / hero），正文留空；删掉对应 data 文件时模板会回退渲染 md 正文（向后兼容）。
