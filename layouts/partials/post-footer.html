@@ -49,10 +49,26 @@
   <div class="h-px flex-1 bg-linear-to-r from-transparent via-border/30 to-transparent"></div>
 </div>
 
-{{- /* 上下篇：Previous=更早 / Next=更新（Hugo 页面集合按时间倒序，NextPage=下一篇更旧，
-     .Prev=更早 / .Next=更新（实测 Hugo 语义；源站 Previous=更早 → 取 .Prev，Next=更新 → 取 .Next） */}}
+{{- /* 上下篇：仅限 content/posts 下的非草稿文章（不指向说说 / 单页 / 草稿）。
+     自建集合按日期倒序（新的在前）：Previous = 更早（idx+1），Next = 更新（idx-1）。
+     当前页不属于该集合时整块不渲染。 */}}
+{{- $navPool := where site.RegularPages "Type" "posts" }}
+{{- $navPool = where $navPool "Draft" false }}
+{{- $navPool = $navPool.ByDate.Reverse }}
+{{- $cur := . }}
+{{- $curIdx := -1 }}
+{{- range $i, $p := $navPool }}
+  {{- if eq $p.RelPermalink $cur.RelPermalink }}{{ $curIdx = $i }}{{ end }}
+{{- end }}
+{{- $prevPost := false }}
+{{- $nextPost := false }}
+{{- if ge $curIdx 0 }}
+  {{- if lt (add $curIdx 1) (len $navPool) }}{{ $prevPost = index $navPool (add $curIdx 1) }}{{ end }}
+  {{- if gt $curIdx 0 }}{{ $nextPost = index $navPool (sub $curIdx 1) }}{{ end }}
+{{- end }}
+{{- if or $prevPost $nextPost }}
 <div data-search-ignore class="grid grid-cols-2 gap-3">
-  {{- with .Prev }}
+  {{- with $prevPost }}
   <a href="{{ .RelPermalink }}" class="post-nav-link group relative flex flex-col gap-1 rounded-2xl border border-border/20 px-5 py-4 transition-all duration-300 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5">
     <div class="post-nav-bg"></div>
     <div class="flex items-center gap-1.5">
@@ -62,7 +78,7 @@
     <span class="line-clamp-2 text-[0.9375rem] leading-snug font-medium text-foreground/70 transition-colors duration-200 group-hover:text-accent">{{ .Title }}</span>
   </a>
   {{- end }}
-  {{- with .NextInSection }}
+  {{- with $nextPost }}
   <a href="{{ .RelPermalink }}" data-floating-next-post-title="{{ .Title }}" data-floating-next-post-href="{{ .RelPermalink }}" class="post-nav-link group relative col-start-2 flex flex-col items-end gap-1 rounded-2xl border border-border/20 px-5 py-4 text-end transition-all duration-300 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5">
     <div class="post-nav-bg"></div>
     <div class="flex items-center gap-1.5">
@@ -73,5 +89,6 @@
   </a>
   {{- end }}
 </div>
+{{- end }}
 
 {{- partial "comment-section.html" . }}
