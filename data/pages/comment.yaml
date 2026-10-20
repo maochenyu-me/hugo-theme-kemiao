@@ -1,0 +1,10 @@
+# 留言板页文案（占位模板，对应模板 themes/kemiao/layouts/_default/comment.html）
+intro:
+  kicker: ''
+  title: ''
+  paragraphs: []
+  quote: ''
+notice:
+  summary: ''
+  rules: []
+  warn: []

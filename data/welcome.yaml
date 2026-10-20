@@ -1,0 +1,6 @@
+# 欢迎来访者卡文案（占位模板，首页右栏 / 文章侧栏共用）
+# 改这里即可，不用动模板；每项 paragraphs 为一段 HTML，可写 <a>、<strong> 等。
+# 若不想显示卡片，直接删除本文件或把 paragraphs 留空。
+title: ''
+icon: ''
+paragraphs: []

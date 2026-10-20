@@ -1,8 +1,10 @@
 # kemiao
 
-一个为 Hugo 打造的博客主题，从 Astro 主题 [blog.liushen.fun](https://blog.liushen.fun/)（LiuShen 的博客）逐像素移植而来。
+一个为 Hugo 打造的博客主题，支持 PWA、双主题、多语言评论、说说三数据源等功能。
 
-玻璃拟态顶栏、终端风 Hero、swup 无刷新跳转、全站统一灯箱、跑马灯技能区、IP 定位欢迎卡、Umami 流量卡、三数据源说说、多云评论后端——源站有的基本都在，并且针对静态站做了首屏优化。
+玻璃拟态顶栏、终端风 Hero、swup 无刷新跳转、全站统一灯箱、跑马灯技能区、IP 定位欢迎卡、Umami 流量卡、三数据源说说、多云评论后端——功能核心基本都在，并且针对静态站做了首屏优化。
+
+**当前版本不是完整复刻原站项目**，保留了核心视觉与交互，但在配置、数据源、部分组件上做了自改与精简。你可以参考本主题自行改造使用，无需完全照搬。
 
 > 文档位置：本文件位于**主题仓库根目录**。文中出现的 `themes/kemiao/...` 表示「本站点项目里的主题目录」，`tools/...`、`content/...`、`hugo.toml` 均指**站点项目根目录**（即主题的上一级），因为主题需要与站点配置、数据、工具脚本配合才能跑起来。
 
@@ -354,7 +356,7 @@ node tools/build.mjs --no-pf  # 跳过 pagefind 索引
 
 | 字段 | 说明 |
 | --- | --- |
-| `api` | IP 定位接口，默认 `https://60s-api.518339.xyz/v2/ip` |
+| `api` | IP 定位接口地址 |
 | `originLat` / `originLng` | 博主坐标，用于算访客距离；任一为 0 则不显示距离行 |
 | `cacheTtl` | 定位结果缓存秒数，默认 3600 |
 
@@ -631,7 +633,7 @@ python tools/gen-pwa-assets.py --src your-logo.png   # 建议 >=512x512 透明 P
 - **像素级对比**：Playwright 双主题全页截图 + Pillow diff，只统计单通道差 > 12 的像素。不设阈值的话，1 个色阶的抖动会把「差异像素」撑到几十万，全是噪声。
 - **图标字形**：遍历 `[class*="fa-"]` 元素的 `::before` content，必须全部非空。
 - **换页回归**：`about → archives → tags → 首页` 走一遍，检查 window 上的标记是否保留（证明没有整页刷新）、每次换页统计是否只上报一次。
-- **与源站对照**：涉及交互/布局的改动，拿 [blog.liushen.fun](https://blog.liushen.fun/) 跑同一套探测做对照。只看几何容易误判——曾经因为两边盒子坐标完全一致，差点漏掉真正的层叠问题。
+- **与源站对照**：涉及交互/布局的改动，拿对应的原始站点跑同一套探测做对照。只看几何容易误判——曾经因为两边盒子坐标完全一致，差点漏掉真正的层叠问题。
 
 ### 9. 发布前清 `public/`
 
@@ -802,7 +804,7 @@ Umami v3 需要 `x-umami-share-context: 1`，且 `umamiShareId` 必须是分享�
 
 ## 十三、致谢
 
-- 视觉与交互设计来自 [blog.liushen.fun](https://blog.liushen.fun/)（LiuShen），本主题是它的 Hugo 移植。
+- 视觉与交互设计参考自公开的静态博客主题实践，本主题为其 Hugo 方向的独立实现。
 - 图标 [Font Awesome](https://fontawesome.com/)（Free 版，子集化使用）。
 - 路由 [swup](https://swup.js.org/)。
 - 搜索 [Pagefind](https://pagefind.app/)。

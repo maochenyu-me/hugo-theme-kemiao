@@ -1,0 +1,27 @@
+# 友链申请页文案（占位模板，对应模板 themes/kemiao/layouts/_default/addlink.html）
+# 站点域名、站名、头像等站点信息由模板读取 hugo.toml 的 params，不在这里维护。
+flow:
+  kicker: ''
+  title: ''
+  steps: []
+requirements:
+  kicker: ''
+  title: ''
+  id: ''
+  items: []
+domains:
+  kicker: ''
+  title: ''
+  items: []
+mysite:
+  kicker: ''
+  title: ''
+  copy: ''
+  note: ''
+format:
+  kicker: ''
+  title: ''
+  copy: ''
+  fields: []
+  button: ''
+  notes: []

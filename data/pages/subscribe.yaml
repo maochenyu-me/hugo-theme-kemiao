@@ -1,0 +1,34 @@
+# 订阅页文案（占位模板，对应模板 themes/kemiao/layouts/_default/subscribe.html）
+cards:
+  - icon: ''
+    title: ''
+    desc: ''
+    action: ''
+    href: ''
+  - icon: ''
+    title: ''
+    desc: ''
+    action: ''
+    href: ''
+    external: true
+
+rss:
+  kicker: ''
+  title: ''
+  icon: ''
+  desc: ''
+  toolsLabel: ''
+  tools: []
+
+mail:
+  kicker: ''
+  title: ''
+  icon: ''
+  # desc 里 {link} 会被替换成下面的链接
+  desc: ''
+  link:
+    label: ''
+    href: ''
+  steps: []
+
+footer: ''

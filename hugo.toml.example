@@ -1,0 +1,279 @@
+# kemiao 主题配置示例（占位模板）
+# 复制到站点根目录作为 hugo.toml，按注释替换成你自己的值即可。
+# 主题不用 theme = 'kemiao' 挂载，改为手动 mounts（见下）。
+
+baseURL = ''
+locale = 'zh-cn'
+defaultContentLanguage = 'zh-cn'
+title = ''
+hasCJKLanguage = true
+
+[module]
+  [[module.mounts]]
+    source = 'content'
+    target = 'content'
+  [[module.mounts]]
+    source = 'data'
+    target = 'data'
+  [[module.mounts]]
+    source = 'assets'
+    target = 'assets'
+  [[module.mounts]]
+    source = 'static'
+    target = 'static'
+  [[module.mounts]]
+    source = 'layouts'
+    target = 'layouts'
+  [[module.mounts]]
+    source = 'i18n'
+    target = 'i18n'
+  [[module.mounts]]
+    source = 'archetypes'
+    target = 'archetypes'
+  [[module.mounts]]
+    source = 'themes/kemiao/layouts'
+    target = 'layouts'
+  [[module.mounts]]
+    source = 'themes/kemiao/assets'
+    target = 'assets'
+  [[module.mounts]]
+    source = 'themes/kemiao/static'
+    target = 'static'
+  [[module.mounts]]
+    source = 'themes/kemiao/i18n'
+    target = 'i18n'
+  [[module.mounts]]
+    source = 'themes/kemiao/archetypes'
+    target = 'archetypes'
+
+[outputs]
+  home = ['HTML', 'RSS', 'MANIFEST']
+
+[mediaTypes]
+  [mediaTypes.'application/manifest+json']
+    suffixes = ['json']
+
+[outputFormats]
+  [outputFormats.RSS]
+    mediatype = 'application/rss'
+    baseName = 'atom'
+  [outputFormats.MANIFEST]
+    mediaType = 'application/manifest+json'
+    baseName = 'manifest'
+    isPlainText = true
+    notAlternative = true
+
+[taxonomies]
+  category = 'categories'
+  tag = 'tags'
+
+summaryLength = 120
+
+[permalinks]
+  posts = '/posts/:slug/'
+
+[markup]
+  [markup.highlight]
+    noClasses = false
+    lineNos = false
+    codeFences = true
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+    [markup.goldmark.parser]
+      [markup.goldmark.parser.attribute]
+        block = true
+
+[params]
+  description = ''
+  keywords = []
+  author = ''
+  avatar = ''
+  ogImage = ''
+  siteshot = ''
+  defaultTheme = 'auto'
+  runtimeStart = ''
+  copyrightStartYear = 2024
+  beianIcp = ''
+  beianPolice = ''
+  beianPoliceCode = ''
+  footerTagline = ''
+
+  footerCredit = ''
+  footerCreditUrl = ''
+  footerCreditNewTab = true
+
+  [[params.footerCredits]]
+    text = ''
+    url = ''
+    newTab = true
+
+  [params.logo]
+    left = ''
+    mark = ''
+    right = ''
+    markLetterSpacing = 0
+    leftOffsetX = 0
+    markOffsetX = 0
+    rightOffsetX = 0
+    width = 0
+
+  [params.icons]
+    provider = 'local'
+    cdn = ''
+
+  [params.search]
+    provider = 'pagefind'
+    [params.search.algolia]
+      appId = ''
+      apiKey = ''
+      indexName = ''
+      hitsPerPage = 5
+    [params.search.pagefind]
+      basePath = '/pagefind/'
+      hitsPerPage = 5
+
+  [params.comments]
+    provider = 'artalk'
+    [params.comments.artalk]
+      server = ''
+      site = ''
+    [params.comments.twikoo]
+      envId = ''
+    [params.comments.recentComments]
+      authorFilter = ''
+    [params.comments.ecoku]
+      serverUrl = ''
+      siteId = ''
+      pageSize = 10
+      theme = 'auto'
+      i18n = 'zh-CN'
+
+  [params.article]
+    [params.article.aiSummary]
+      brand = ''
+      model = ''
+    [params.article.share]
+      whatsapp = false
+      facebook = false
+      x = false
+      telegram = false
+      pinterest = false
+      email = false
+
+  [params.fonts]
+    yozaiCss = ''
+
+  [params.welcome]
+    api = ''
+    originLat = 0
+    originLng = 0
+    cacheTtl = 3600
+
+  [params.background]
+    enable = false
+    position = 'top center'
+    size = 'cover'
+    scale = 1.0
+    [params.background.light]
+      image = ''
+      color = ''
+      opacity = 0.0
+      blur = 0
+      saturate = 1.0
+    [params.background.dark]
+      image = ''
+      color = ''
+      opacity = 0.0
+      blur = 0
+      saturate = 1.0
+
+  [params.umami]
+    enable = false
+    src = ''
+    websiteId = ''
+    domains = ''
+
+  [params.traffic]
+    umamiBase = ''
+    umamiShareId = ''
+    timezone = 'Asia/Shanghai'
+    cacheTtl = 3600
+
+  [params.busuanzi]
+    enable = false
+    src = ''
+
+  [params.musicCapsule]
+    enable = false
+    id = ''
+    server = ''
+    type = ''
+    volume = ''
+    api = ''
+    aplayerCss = ''
+    aplayerScript = ''
+    metingScript = ''
+
+  [params.safego]
+    param = 'u'
+    countdown = 10
+    protocols = ''
+
+  [params.pwa]
+    enable = false
+    shortName = ''
+    themeColor = ''
+    backgroundColor = ''
+    display = 'standalone'
+    startUrl = '/'
+
+  [params.hero]
+    title = ''
+    terminalPrefix = '~'
+    terminalPath = ''
+    terminalSuffix = '$'
+    avatar = ''
+    authorLabel = ''
+    authorName = ''
+    authorUrl = ''
+    [[params.hero.socials]]
+      icon = ''
+      title = ''
+      url = ''
+
+  [params.sidebar]
+    postPerIndex = 8
+    [params.sidebar.welcome]
+      enable = false
+    [params.sidebar.patron]
+      enable = false
+      moreLabel = ''
+      moreUrl = ''
+    [params.sidebar.traffic]
+      enable = false
+    [params.sidebar.webinfo]
+      enable = false
+
+  [params.shuoshuo]
+    source = 'local'
+    author = ''
+    avatar = ''
+    tickerCount = 5
+    api = ''
+    mediaOrigin = ''
+    fetchLimit = 30
+    [params.shuoshuo.tg]
+      baseUrl = ''
+      channelId = ''
+      pageSize = 12
+      author = ''
+      avatar = ''
+      detailLink = false
+
+  [params.fcircle]
+    api = ''
+    statusApi = ''
+
+[pagination]
+  pagerSize = 12
