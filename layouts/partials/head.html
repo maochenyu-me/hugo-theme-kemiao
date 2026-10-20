@@ -30,14 +30,29 @@
 {{- /* 页面背景：由 [params.background] 渲染出覆盖样式表，必须排在上面三个样式表之后才压得动 */}}
 {{- partial "background-style.html" . -}}
 
-{{- /* 图标：local 自托管（static/fontawesome/），可切 cdn 回源站同款外链
+{{- /* 图标：local 自托管（assets/fontawesome/），可切 cdn 回源站同款外链
        all.subset.min.css 由 tools/subset-fa-css.py 生成（只留用到的图标定义，73KB→12KB），
-       新增图标后重跑该脚本（配套 tools/subset-fonts.py 裁字体）。 */}}
+       新增图标后重跑该脚本（配套 tools/subset-fonts.py 裁字体）。
+       走 assets 资源管线 + fingerprint：字体/CSS URL 带内容哈希，
+       子集内容一变 URL 就变，浏览器与 CDN 不会继续吃旧字体（曾导致暂停图标缺字形）。 */}}
 {{- if eq ($site.icons.provider | default "local") "cdn" }}
 <link rel="preconnect" href="{{ (urls.Parse $site.icons.cdn).Scheme }}://{{ (urls.Parse $site.icons.cdn).Host }}" crossorigin>
 <link rel="stylesheet" href="{{ $site.icons.cdn }}">
 {{- else }}
-<link rel="stylesheet" href="/fontawesome/css/all.subset.min.css">
+{{- with resources.Get "fontawesome/css/all.subset.min.css" }}
+{{- $faFonts := slice }}
+{{- range $name := (slice "fa-solid-900" "fa-regular-400" "fa-brands-400" "fa-v4compatibility") }}
+{{- with resources.Get (printf "fontawesome/webfonts/%s.woff2" $name) }}
+{{- $faFonts = $faFonts | append (dict "raw" (printf "../webfonts/%s.woff2" $name) "res" (. | fingerprint)) }}
+{{- end }}
+{{- end }}
+{{- $faCss := .Content }}
+{{- range $f := $faFonts }}
+{{- $faCss = replace $faCss $f.raw $f.res.RelPermalink }}
+{{- end }}
+{{- $faOut := $faCss | resources.FromString "fontawesome/css/all.subset.min.css" | fingerprint }}
+<link rel="stylesheet" href="{{ $faOut.RelPermalink }}">
+{{- end }}
 {{- end }}
 {{- /* 字体：悠哉体 CSS 由 theme-script 按偏好注入（默认系统字体，首访不拉 ~900KB 分片） */}}
 

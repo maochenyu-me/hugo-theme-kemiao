@@ -1,7 +1,7 @@
 {{- /* 欢迎来访者卡（首页右栏与文章侧栏共用）
      文案来自 data/welcome.yaml（title / icon / paragraphs），
      也可用 params.welcomeCard 覆盖；两者都没有时回退到下面的内置默认。 */}}
-{{- $d := site.Data.welcome | default dict }}
+{{- $d := hugo.Data.welcome | default dict }}
 {{- $o := site.Params.welcomeCard | default dict }}
 {{- $title := $o.title | default $d.title | default "欢迎来访者" }}
 {{- $icon := $o.icon | default $d.icon | default "fa-solid fa-user-astronaut" }}

@@ -1,4 +1,6 @@
 // 音乐胶囊（源站 music-capsule 1:1）：APlayer/Meting 资产懒加载、播放态、拉伸、贴底隐藏
+import { getPreference } from "./site-preferences.js";
+
 const CONFIG = {
   aplayerCss: "",
   aplayerScript: "",
@@ -20,8 +22,7 @@ let signal = null;
 
 function prefEnabled() {
   try {
-    const raw = JSON.parse(localStorage.getItem("site-settings") || "{}");
-    return raw.musicCapsule !== false;
+    return getPreference("musicCapsule") !== false;
   } catch { return true; }
 }
 
@@ -153,13 +154,17 @@ function bindInner() {
   if (!box || !signal) return;
   const music = box.querySelector(".aplayer-music");
   const button = box.querySelector(".aplayer-button");
+  // APlayer 自身在 .aplayer-pic 上监听 click 并调用 player.toggle()，
+  // 这里再绑一个 toggle 会导致一次点击触发两次（先 pause 再 play，表现为"点了没反应"）。
+  // 源站同理只绑 .aplayer-music（拉伸），播放/暂停交给 APlayer 原生处理。
+  if (runtime.innerBound === button) {
+    attachPlayer(runtime.player ?? metingEl()?.aplayer);
+    return;
+  }
+  runtime.innerBound = button;
   music?.addEventListener("click", (e) => {
     e.stopPropagation();
     box.classList.toggle("stretch");
-  }, { signal: signal });
-  button?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggle();
   }, { signal: signal });
   attachPlayer(runtime.player ?? metingEl()?.aplayer);
 }

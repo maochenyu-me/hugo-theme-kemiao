@@ -17,6 +17,29 @@
     </div>
     {{- end }}
     {{- end }}
+    {{- /* AI 摘要卡片（源站 liushen.fun 1:1；由 frontmatter ai_summary 驱动，为空不渲染） */}}
+    {{- if .Params.ai_summary }}
+    <div class="px-3 pb-4 sm:px-6 sm:pb-6">
+      <section class="ai-summary-card text-start" aria-labelledby="ai-summary-title">
+        <div class="ai-summary-glow" aria-hidden="true"></div>
+        <div class="ai-summary-surface">
+          <div class="ai-summary-head" aria-hidden="true">
+            <span class="ai-summary-dot ai-summary-dot-red"></span>
+            <span class="ai-summary-dot ai-summary-dot-yellow"></span>
+            <span class="ai-summary-dot ai-summary-dot-green"></span>
+          </div>
+          <p class="ai-summary-text">{{ .Params.ai_summary }}</p>
+          <div class="ai-summary-footer">
+            <div class="ai-summary-brand" id="ai-summary-title">
+              <i class="fa-solid fa-wand-magic-sparkles text-base leading-none" aria-hidden="true"></i>
+              <span>克喵のAI摘要</span>
+            </div>
+            <span class="ai-summary-model">KIMI-K2.5</span>
+          </div>
+        </div>
+      </section>
+    </div>
+    {{- end }}
     {{ .Content }}
   </article>
   {{- partial "post-sidebar.html" . }}
