@@ -4,7 +4,7 @@
   <div class="relative z-5">
     <h3 class="mb-3 flex items-center gap-2 text-[1.125rem] font-bold tracking-wide text-foreground">
       <i class="fa-solid fa-chart-line text-sm leading-none text-accent/60" aria-hidden="true"></i>网站信息</h3>
-    {{- $posts := where site.RegularPages "Type" "posts" }}
+    {{- $posts := where (where site.RegularPages "Type" "posts") "Draft" "eq" false }}
     {{- $words := 0 }}{{ range $posts }}{{ $words = add $words .WordCount }}{{ end }}
     <dl class="webinfo-list">
       <div><dt>文章数目</dt><dd>{{ len $posts }}</dd></div>

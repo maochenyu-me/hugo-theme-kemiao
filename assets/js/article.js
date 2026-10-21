@@ -206,6 +206,24 @@ function initBackButton() {
   button.href = href;
 }
 
+// 表格滑动提示：超出容器宽度才显示「左右滑动」，滑过后隐藏
+function initTableScroll(signal) {
+  document.querySelectorAll('.app-prose .table-wrapper').forEach((wrap) => {
+    const scroll = wrap.querySelector('.table-wrapper-scroll');
+    const hint = wrap.querySelector('[data-scroll-hint]');
+    if (!scroll || !hint || hint.dataset.bound) return;
+    hint.dataset.bound = '1';
+    const update = () => {
+      hint.hidden = scroll.scrollWidth - scroll.clientWidth < 8;
+    };
+    update();
+    scroll.addEventListener('scroll', () => {
+      if (scroll.scrollLeft > 32) hint.hidden = true;
+    }, { signal });
+    window.addEventListener('resize', update, { signal });
+  });
+}
+
 function initArticle(signal) {
   normalizeTocRoots();
   document.querySelectorAll('[data-toc-root]').forEach((root) => initTocSpy(root, signal));
@@ -213,6 +231,7 @@ function initArticle(signal) {
   typeAiSummaries();
   addHeadingLinks();
   initBackButton();
+  initTableScroll(signal);
 }
 
 // 初始化由 site.js 每页管线驱动（swup 换页后随新 DOM 重挂）

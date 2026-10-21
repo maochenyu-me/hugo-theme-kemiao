@@ -29,11 +29,11 @@
 {{- $unit := "个标签" }}
 {{- if eq $label "分类" }}{{ $unit = "个分类" }}{{ end }}
 {{- /* 文章数只统计 posts（与首页/归档/网站信息卡一致；site.RegularPages 会把说说和独立页面也算进来） */}}
-{{- $postCount := len (where site.RegularPages "Type" "posts") }}
+{{- $postCount := len (where (where site.RegularPages "Type" "posts") "Draft" "eq" false) }}
 {{- /* 标签卡只统计文章：过滤掉说说/独立页面贡献的标签与计数 */}}
 {{- $cards := slice }}
 {{- range .Data.Terms.ByCount }}
-  {{- $posts := where .Page.Pages "Type" "posts" }}
+  {{- $posts := where (where .Page.Pages "Type" "posts") "Draft" "eq" false }}
   {{- if gt (len $posts) 0 }}
     {{- $cards = $cards | append (dict "page" .Page "count" (len $posts)) }}
   {{- end }}

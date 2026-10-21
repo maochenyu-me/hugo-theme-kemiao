@@ -1,7 +1,7 @@
 {{- /* 文章列表页（/posts/）：Hero + 搜索工具栏 + 三列卡片 + 分页 */}}
 {{- define "main" }}
 {{- partial "breadcrumb.html" (dict "label" "Posts") }}
-{{- $pages := where site.RegularPages "Type" "posts" }}
+{{- $pages := where (where site.RegularPages "Type" "posts") "Draft" "eq" false }}
 {{- $paginator := .Paginate $pages }}
 {{- partial "page-hero.html" (dict
     "title" "文章"

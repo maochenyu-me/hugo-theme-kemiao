@@ -1,6 +1,6 @@
 {{- /* 归档页：按年/月分组（GroupByDate） */}}
 {{- define "main" }}
-{{- $pages := where site.RegularPages "Type" "posts" }}
+{{- $pages := where (where site.RegularPages "Type" "posts") "Draft" "eq" false }}
 {{- $span := 1 }}
 {{- if $pages }}
   {{- $oldest := index ($pages.ByDate) 0 }}
