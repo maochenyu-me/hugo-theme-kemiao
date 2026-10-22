@@ -28,8 +28,10 @@
     <li class="breadcrumb-item">
       <a href="{{ with site.GetPage "/posts" }}{{ .RelPermalink }}{{ else }}{{ "posts/" | relURL }}{{ end }}" class="breadcrumb-link">Posts</a>
     </li>
+    {{- /* 文章页当前项显示 slug（如 6a6de263），与源站一致；无 slug 时回退文件名，再回退标题 */}}
     <li class="breadcrumb-item is-current">
-      <span class="breadcrumb-current" aria-current="page" title="{{ .Title }}">{{ .Title }}</span>
+      {{- $crumb := .Slug | default .File.ContentBaseName | default .Title }}
+      <span class="breadcrumb-current" aria-current="page" title="{{ $crumb }}">{{ $crumb }}</span>
     </li>
     {{- end }}
   </ol>
