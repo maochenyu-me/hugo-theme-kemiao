@@ -5,7 +5,10 @@
   {{- $simple = true }}
   {{- $label = .label }}
 {{- end }}
-<nav aria-label="面包屑" class="mt-6 mb-2 flex items-center gap-2 overflow-hidden">
+{{- /* 源站 DOM：nav > div(flex items-center gap-3 [+ justify-between]) > back 按钮 + ol
+      文章页 back 在左、路径条靠右（justify-between）；独立页仅路径条、左对齐 */}}
+<nav aria-label="{{ if $simple }}breadcrumb{{ else }}文章导航{{ end }}" class="mt-6 mb-2{{ if not $simple }} overflow-hidden{{ end }}">
+  <div class="flex items-center gap-3{{ if not $simple }} justify-between{{ end }}">
   {{- if not $simple }}
   <a id="back-button" href="/" class="breadcrumb-bar back-btn group flex-shrink-0 !gap-2 font-cartograph text-[0.9375rem] text-foreground/60 transition-colors duration-200 hover:text-accent focus-visible:ring-2 focus-visible:ring-accent/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none" aria-label="返回上一页。当前位置：{{ .Title }}">
     <i class="fa-solid fa-chevron-left text-base leading-none opacity-70 transition-transform duration-200 group-hover:-translate-x-0.5 rtl:rotate-180 rtl:group-hover:translate-x-0.5" aria-hidden="true"></i>
@@ -35,4 +38,5 @@
     </li>
     {{- end }}
   </ol>
+  </div>
 </nav>
